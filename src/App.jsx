@@ -24,13 +24,14 @@ const COGNITO_LOGOUT_URL = `${COGNITO_URL}/logout?client_id=${CLIENT_ID}&logout_
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
+  const loginUrl = COGNITO_LOGIN_URL;
+  const logoutUrl=COGNITO_LOGOUT_URL;
+  const deviceIsMobile=undefined;
   // const [baseUrl, setBasUrl]= useState(`${ORIGIN}${PATHNAME}`);
   const [statusMsg, setStatusMsg]= useState('Email contents will appear here');
   const [emailContent, setEmailContent]= useState(undefined);
   const [emailSet, setEmailSet]= useState(undefined);
-  const [authDetails, setAuth]= useState(undefined);
-  const loginUrl = COGNITO_LOGIN_URL;
-  const logoutUrl=COGNITO_LOGOUT_URL;
+  const [authDetails, setAuthDetails]= useState(localStorage.userDetails ? JSON.parse(localStorage.userDetails) : undefined);
   const [currentEmail, setCurrentEmail]= useState(undefined);
   const [currentEmailId, setcurrentEmailId]= useState(undefined);
   const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
@@ -45,7 +46,6 @@ const App = (props) => {
   const [emailSubject, setEmailSubject] = useState(undefined);
   const [iframeComposedEmail, setIframeComposedEmail] = useState(undefined);
   const [emailSendStatus, setEmailSendStatus] = useState(undefined);
-  const deviceIsMobile=undefined;
   const [emailSendStatusMessage, setEmailSendStatusMessage]= useState(undefined);
   const [ses, setSes]= useState(undefined);
   const [secretAccessKey, setSecretAccessKey]= useState(undefined);
@@ -57,9 +57,16 @@ const App = (props) => {
   const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   useEffect(() => {
-    setAuthDetails();
-    if(!authTokenIsValid()) {
-      redirectToLogin();
+    if(localStorage.getItem("userDetails") && !authDetails){
+      let details = JSON.parse(localStorage.userDetails);
+      const tem = async(details) => {
+        await setAuthDetails(details);
+      }
+      tem(details).then(() => {
+        if(!authTokenIsValid()) redirectToLogin();
+      });
+    } else {
+      setAuthCredentials();
     }
     let tempSesRegions = {"regions":[{"id":"us-east-1","name":"US East","location":"N. Virginia","optIn":false,"visible":true},{"id":"us-east-2","name":"US East","location":"Ohio","optIn":false,"visible":true},{"id":"us-west-1","name":"US West","location":"N. California","optIn":false},{"id":"us-west-2","name":"US West","location":"Oregon","optIn":false,"visible":true},{"id":"af-south-1","name":"Africa","location":"Cape Town","optIn":true},{"id":"ap-east-1","name":"Asia Pacific","location":"Hong Kong","optIn":true},{"id":"ap-south-1","name":"Asia Pacific","location":"Mumbai","optIn":false,"visible":true},{"id":"ap-northeast-2","name":"Asia Pacific","location":"Seoul","optIn":false,"visible":true},{"id":"ap-southeast-1","name":"Asia Pacific","location":"Singapore","optIn":false,"visible":true},{"id":"ap-southeast-2","name":"Asia Pacific","location":"Sydney","optIn":false},{"id":"ap-northeast-1","name":"Asia Pacific","location":"Tokyo","optIn":false,"visible":true},{"id":"ca-central-1","name":"Canada","location":"Central","optIn":false},{"id":"eu-central-1","name":"Europe","location":"Frankfurt","optIn":false,"visible":true},{"id":"eu-west-1","name":"Europe","location":"Ireland","optIn":false,"visible":true},{"id":"eu-west-2","name":"Europe","location":"London","optIn":false,"visible":true},{"id":"eu-south-1","name":"Europe","location":"Milan","optIn":true},{"id":"eu-west-3","name":"Europe","location":"Paris","optIn":false},{"id":"eu-north-1","name":"Europe","location":"Stockholm","optIn":false},{"id":"me-south-1","name":"Middle East","location":"Bahrain","optIn":true},{"id":"sa-east-1","name":"South America","location":"São Paulo","optIn":false,"visible":true}]};
     readLocalData();
@@ -67,32 +74,60 @@ const App = (props) => {
   }, []);
 
   useEffect(() => {
-      showEmail(emailSet[0].Key);
+      if(emailSet)
+        showEmail(emailSet[0].Key);
   }, [emailSet]);
 
   useEffect(() => {
-    clearEmailDestinations();
-    setEmailDestinations();
+    if(currentEmail){
+      clearEmailDestinations();
+      setEmailDestinations();
+    }
   }, [currentEmail]);
 
   useEffect(() => {
-    const htmlBlob = new Blob([htmlEmailContent], { type: 'text/html' });
-    setIframeComposedEmail(URL.createObjectURL(htmlBlob));
+    if(htmlEmailContent){
+      const htmlBlob = new Blob([htmlEmailContent], { type: 'text/html' });
+      setIframeComposedEmail(URL.createObjectURL(htmlBlob));
+    }
   },[htmlEmailContent]);
 
   useEffect(() => {
-    if(authDetails)
+    if(authDetails){
       getEmails();
-    // else  
-    //   console.log(authDetails)
-    //   redirectToLogin();
-  }, [authDetails]);
+    } 
+  }, [ authDetails ]);
 
   useEffect(() => {
     getSESObject(true);
     updateLocalData();
   }, [accessKeyId, secretAccessKey, region]);
 
+  const setAuthCredentials=async()=>{
+    let hash = (new URL(document.location)).hash;
+    let loc = hash ? document.location.href.replace(/#/, '?') : document.location;
+    let params = (new URL(loc)).searchParams;
+    if(params.get('id_token') && params.get('access_token') && params.get('expires_in') && tokenIsValid(params.get('id_token'))){
+      let temp = {
+        id_token: params.get('id_token'),
+        access_token: params.get('access_token'),
+      };
+      localStorage.setItem("userDetails" ,JSON.stringify(temp));
+    }else{ 
+      localStorage.removeItem("userDetails") 
+      redirectToLogin();
+    }
+  };
+
+  const tokenIsValid=(idToken)=>{
+    try{
+      let x = JSON.parse(atob(idToken.split('.')[1]));
+      return Date.now() < x.exp * 1000;//converting exp to msec
+    } catch(e){
+      setStatusMsg(`Error: ${e}`)
+    }
+    return false;
+  };
   const shareableUrl = () => {
     return `${ORIGIN}${PATHNAME}/get.html?emailId=${currentEmailId}`;
   };
@@ -200,28 +235,7 @@ const App = (props) => {
       setDataMustBeSavedLocally(true);
     }
   };
-  const setAuthDetails=async ()=>{
-    // await setAuth(null);
-    let hash = (new URL(document.location)).hash;
-    let loc = hash ? document.location.href.replace(/#/, '?') : document.location;
-    let params = (new URL(loc)).searchParams;
-    if(params.get('id_token') && params.get('access_token') && params.get('expires_in') && tokenIsValid(params.get('id_token'))){
-      setAuth({
-        id_token: params.get('id_token'),
-        access_token: params.get('access_token'),
-      });   
-      console.log(authDetails)
-    }else{console.log("not done")}
-  };
-  const tokenIsValid=(idToken)=>{
-    try{
-      let x = JSON.parse(atob(idToken.split('.')[1]));
-      return Date.now() < x.exp * 1000;//converting exp to msec
-    } catch(e){
-      setStatusMsg(`Error: ${e}`)
-    }
-    return false;
-  };
+  
   const authTokenIsValid=()=>{
     return authDetails && tokenIsValid(authDetails.id_token);
   };
@@ -267,10 +281,10 @@ const App = (props) => {
     }
   };
   const getEmails= async ()=> {
-    setEmailContent(undefined);
-    setStatusMsg('Retrieving...');
+    await setEmailContent(undefined);
+    await setStatusMsg('Retrieving...');
     if(authTokenIsValid() && fqdn){
-      setEmailSet(undefined);
+      await setEmailSet(undefined);
       await axios({
         url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
         headers: {'Authorization': authDetails.id_token},
@@ -282,14 +296,14 @@ const App = (props) => {
             return email;
           }));
         }
-        setStatusMsg("Hooray! You haven't received any emails today. Lucky you!")
+        await setStatusMsg("Hooray! You haven't received any emails today. Lucky you!")
       })
-      .then(values => {
+      .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        setEmailSet(tempEmailSet);
+        await setEmailSet(tempEmailSet);
       });
     } else {
-      setStatusMsg('Please login again...');
+      await setStatusMsg('Please login again...');
       redirectToLogin();
     }
   };
@@ -471,7 +485,7 @@ const App = (props) => {
               {
                 emailSet ?
                 emailSet.map((email, idx)=> (
-                  <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClicl={() => showEmail(email.Key)} className="is-size-6">
+                  <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={() => showEmail(email.Key)} className="is-size-6">
                     {
                       email.emailContent ? 
                       <a >
@@ -522,13 +536,13 @@ const App = (props) => {
                     attachments() ?
                     attachments().map((attachment, idx) => (
                       <li  style={{'cursor': 'pointer'}} key={`attachment-idx-`+idx} id={`attachment-idx-`+idx} className='button'>
-                        <a href="`${attachment.contentLocation}`" download>{attachment.filename}</a>
+                        <a href={`${attachment.contentLocation}`} download>{attachment.filename}</a>
                       </li>
                     ))
                     : null
                   }
                 </ul>
-                <iframe frameBorder="0" style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"100vh",width:"100%"}} height="100vh" width="100vw" src={iframeSrc()}></iframe>
+                <iframe  frameBorder="0" style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"100vh",width:"100%"}} height="100vh" width="100vw" src={iframeSrc()}></iframe>
               </div>
             }   
           </div>
@@ -543,7 +557,7 @@ const App = (props) => {
           </p>
         </div>
       </div>
-      <div className="modal" id="awsCredentialsModal" className={awsModalIsVisible ? 'is-active':''}>
+      <div id="awsCredentialsModal" className={awsModalIsVisible ? 'is-active modal':'modal'}>
         <div className="modal-background" style={{"opacity":"75%"}} onClick={(e) => {e.preventDefault();setAwsModalIsVisible( false)}}></div>
         <div className="modal-card" style={deviceIsMobile ? {'width': '90vw'} : null}>
           <header className="modal-card-head">
@@ -599,7 +613,7 @@ const App = (props) => {
           </footer>
         </div>
       </div>
-      <div className="modal" id="emailComposeModal" className={emailComposeModalIsVisible ? 'is-active':''}>
+      <div id="emailComposeModal" className={emailComposeModalIsVisible ? 'is-active modal':'modal'}>
         <div className="modal-background" style={{"opacity":"75%"}} onClick={(e)=> {e.preventDefault(); setEmailComposeModalIsVisible (false)}}></div>
         <div className="modal-card" style={deviceIsMobile ? {'width': '90vw'} :null}>
           <header className="modal-card-head">
