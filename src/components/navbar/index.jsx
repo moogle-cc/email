@@ -33,7 +33,7 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
             </div>
           </div>
           <div className="navbar-item">
-            <button className="button is-normal is-primary" onClick={() => setAwsModalIsVisible(true)}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</button>
+            <button className="button is-normal is-primary" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</button>
           </div>
         {/* </div> */}
       </nav>

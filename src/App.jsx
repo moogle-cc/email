@@ -80,6 +80,7 @@ const App = (props) => {
     } else {
       setAuthCredentials();
     }
+
     let tempSesRegions = {"regions":[{"id":"us-east-1","name":"US East","location":"N. Virginia","optIn":false,"visible":true},{"id":"us-east-2","name":"US East","location":"Ohio","optIn":false,"visible":true},{"id":"us-west-1","name":"US West","location":"N. California","optIn":false},{"id":"us-west-2","name":"US West","location":"Oregon","optIn":false,"visible":true},{"id":"af-south-1","name":"Africa","location":"Cape Town","optIn":true},{"id":"ap-east-1","name":"Asia Pacific","location":"Hong Kong","optIn":true},{"id":"ap-south-1","name":"Asia Pacific","location":"Mumbai","optIn":false,"visible":true},{"id":"ap-northeast-2","name":"Asia Pacific","location":"Seoul","optIn":false,"visible":true},{"id":"ap-southeast-1","name":"Asia Pacific","location":"Singapore","optIn":false,"visible":true},{"id":"ap-southeast-2","name":"Asia Pacific","location":"Sydney","optIn":false},{"id":"ap-northeast-1","name":"Asia Pacific","location":"Tokyo","optIn":false,"visible":true},{"id":"ca-central-1","name":"Canada","location":"Central","optIn":false},{"id":"eu-central-1","name":"Europe","location":"Frankfurt","optIn":false,"visible":true},{"id":"eu-west-1","name":"Europe","location":"Ireland","optIn":false,"visible":true},{"id":"eu-west-2","name":"Europe","location":"London","optIn":false,"visible":true},{"id":"eu-south-1","name":"Europe","location":"Milan","optIn":true},{"id":"eu-west-3","name":"Europe","location":"Paris","optIn":false},{"id":"eu-north-1","name":"Europe","location":"Stockholm","optIn":false},{"id":"me-south-1","name":"Middle East","location":"Bahrain","optIn":true},{"id":"sa-east-1","name":"South America","location":"São Paulo","optIn":false,"visible":true}]};
     readLocalData();
     setSesRegions(tempSesRegions);
@@ -106,9 +107,7 @@ const App = (props) => {
   useEffect(() => {
     getSESObject(true);
     updateLocalData();
-  }, [keys]);
-
-  
+  }, [keys]); 
 
   const setEmailDestinations=() =>{
     if(emailList.currentEmail){
@@ -241,6 +240,7 @@ const App = (props) => {
         access_token: params.get('access_token'),
       };
       localStorage.setItem("userDetails" ,JSON.stringify(temp));
+      setAuthDetails(temp)
     }else{ 
       localStorage.removeItem("userDetails") 
       redirectToLogin();
@@ -369,7 +369,7 @@ const App = (props) => {
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
           <a className="button" href="#" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
           <p>
-            <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg()})</span> : null}</sub>
+            <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
         </div>
       </div>
