@@ -5,7 +5,7 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
     return  (
         <nav className="container navbar" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
-          <a className="navbar-item is-small title" href="/"><img width="112" height="28" src="../images/zeer0.png" alt="Zeer0" /></a>
+          <a  href="/"><img className="navbar-item is-small title" width="112" height="28" src="assets/moogle-logo.png" alt="Moogle" /></a>
           <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" onClick={() => setAwsModalIsVisible(true)}>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
