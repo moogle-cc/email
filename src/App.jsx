@@ -8,6 +8,7 @@ import EmailList from './components/emailList';
 import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
+import './App.css';
 
 const ADDRESS_DELIM = ",";
 const EMAIL_ADDRESS_DELIM = "@";
@@ -363,11 +364,11 @@ const App = (props) => {
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
-        <div className="column is-one-quarter is-size-5">
+        <div className="column is-one-quarter is-size-5 primary-background">
           {/* <!-- email actions--> */}
-          <a className="button" href="#" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
+          <a className="button secondary-icon-style navbar-item" href="#" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
-          <a className="button" href="#" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
+          <a className="button secondary-icon-style navbar-item" href="#" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>

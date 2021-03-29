@@ -18,23 +18,24 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
           <div className="navbar-end">
             {
               authTokenIsValid() ?
-              <div className="navbar-item is-hoverable">
+              <div className="navbar-item">
                 
-                <a className="navbar-item"  onClick={() => getEmails()}>
-                  Refresh Email List
+                <a className="navbar-item button secondary-icon-style"  onClick={() => getEmails()}>
+                <span className="icon"><i class="fas fa-sync "></i> </span> <span>Refresh Email List </span>
                 </a>
-                <a className="navbar-item" onClick={()=>showEmailComposeScreen(true)}>
-                  <p><i className="far fa-edit"></i> Compose </p>
+                <a className="navbar-item button secondary-icon-style" onClick={()=>showEmailComposeScreen(true)}>
+                  <span className="icon"><i className="far fa-edit "></i> </span> <span>Compose </span>
                 </a>
               </div> 
               
               :null
             }
+            
+            <div className="navbar-item">
+              <a className="navbar-item button secondary-icon-style" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</a>
             </div>
           </div>
-          <div className="navbar-item">
-            <button className="button is-normal is-primary" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</button>
-          </div>
+        </div>
         {/* </div> */}
       </nav>
     )

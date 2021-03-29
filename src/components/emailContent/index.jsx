@@ -19,13 +19,13 @@ const EmailContent = ({emailList}) => {
     };
     return(
         <div className="" id="email-content">
-            <h5 className="has-text-weight-light">Email Preview</h5>
+            <h5 style={{fontFamily: "Poppins", fontWeight: "600"}}>Email Preview</h5>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
                 :
                 <div >
                 {
-                    attachments() && attachments().length > 0 ? <h6 className="has-text-weight-light" v-if="attachments.length > 0">Attachments</h6>: null
+                    attachments() && attachments().length > 0 ? <h6 style={{fontFamily: "Poppins", fontWeight: "600"}}>Attachments</h6>: null
                 }
                 <ul className="menu">
                     {
