@@ -32,13 +32,13 @@ const EmailContent = ({emailList}) => {
                     attachments() && attachments().length>0 ?
                     attachments().map((attachment, idx) => (
                         <li  style={{'cursor': 'pointer'}} key={`attachment-idx-`+idx} id={`attachment-idx-`+idx} className='button'>
-                        <a href={`${attachment.contentLocation}`} download>{attachment.filename}</a>
+                            <a href={`${attachment.contentLocation}`} download>{attachment.filename}</a>
                         </li>
                     ))
                     : null
                     }
                 </ul>
-                <iframe  frameBorder="0" style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"100vh",width:"100%"}} height="100vh" width="100vw" src={iframeSrc()}></iframe>
+                <iframe  title="1" frameBorder="0" style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"100vh",width:"100%"}} height="100vh" width="100vw" src={iframeSrc()}></iframe>
                 </div>
             }   
         </div>

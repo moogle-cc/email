@@ -6,11 +6,11 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
         <nav className="container navbar" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
           <a  href="/"><img className="navbar-item is-small title" width="112" height="28" src="assets/moogle-logo.png" alt="Moogle" /></a>
-          <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" onClick={() => setAwsModalIsVisible(true)}>
+          <button  className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" onClick={() => setAwsModalIsVisible(true)}>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
-          </a>
+          </button>
         </div>
         <div className="navbar-menu">
           <div className="navbar-start is-hidden">
@@ -20,19 +20,19 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
               authTokenIsValid() ?
               <div className="navbar-item">
                 
-                <a className="navbar-item button secondary-icon-style"  onClick={() => getEmails()}>
+                <button className="navbar-item button secondary-icon-style"  onClick={() => getEmails()}>
                 <span className="icon"><i class="fas fa-sync "></i> </span> <span>Refresh Email List </span>
-                </a>
-                <a className="navbar-item button secondary-icon-style" onClick={()=>showEmailComposeScreen(true)}>
+                </button>
+                <button className="navbar-item button secondary-icon-style" onClick={()=>showEmailComposeScreen(true)}>
                   <span className="icon"><i className="far fa-edit "></i> </span> <span>Compose </span>
-                </a>
+                </button>
               </div> 
               
               :null
             }
             
             <div className="navbar-item">
-              <a className="navbar-item button secondary-icon-style" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</a>
+              <button className="navbar-item button secondary-icon-style" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</button>
             </div>
           </div>
         </div>

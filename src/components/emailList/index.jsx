@@ -32,7 +32,7 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
                   <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={() => showEmail(email.Key)} className="is-size-6">
                     {
                       email.emailContent ? 
-                      <a >
+                      <span >
                         { email.emailContent.subject || "(no subject)"}
                         {
                           email.emailContent.headers['x-ses-spam-verdict'] && email.emailContent.headers['x-ses-spam-verdict'] !== 'PASS' ?
@@ -53,7 +53,7 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
                           </div> : null
                         } 
                         <p className="is-size-7"> (to { email.emailContent.to ? email.emailContent.to.text : '[undefined]'} from {email.emailContent.from.text} | { friendlyDate(email.emailContent.date)})</p>
-                      </a>
+                      </span>
                       : null
                     }
                     
