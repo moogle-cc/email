@@ -86,12 +86,14 @@ const App = (props) => {
     readLocalData();
     setSesRegions(tempSesRegions);
   }, []);
+  
   useEffect(() => {
     if(emailList.currentEmail){
       clearEmailDestinations();
       setEmailDestinations();
     }
   }, [emailList])
+  
   useEffect(() => {
     if(htmlEmailContent){
       const htmlBlob = new Blob([htmlEmailContent], { type: 'text/html' });
@@ -366,9 +368,9 @@ const App = (props) => {
         </div>
         <div className="column is-one-quarter is-size-5 primary-background">
           {/* <!-- email actions--> */}
-          <a className="button secondary-icon-style navbar-item" href="#" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
+          <button className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</button>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
-          <a className="button secondary-icon-style navbar-item" href="#" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
+          <button className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></button>
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>

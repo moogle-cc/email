@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 const EmailComposeModal = ({textEmailContent, setEmailComposeModalIsVisible, showEmailComposeScreen, deviceIsMobile, htmlEmailContent, iframeComposedEmail,ADDRESS_DELIM, sendEmailDetails,  setSendEmailDetails, ses, emailComposeModalIsVisible}) => {
-    const [bccEmail, setBccEmail] = useState(undefined);
+    const bccEmail = undefined;
     const [emailSendStatus, setEmailSendStatus] = useState(undefined);
     const [emailSendStatusMessage, setEmailSendStatusMessage]= useState(undefined);
 
