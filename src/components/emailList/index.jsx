@@ -21,8 +21,8 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
     };
 
     return (
-        <aside className="menu">
-            <p className="menu-label">
+        <aside className="menu primary-background">
+            <p className="menu-label" style={{fontFamily: "Poppins", fontWeight: "600"}}>
               Emails
             </p>
             <ul className="menu-list">
