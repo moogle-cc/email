@@ -25,7 +25,7 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
             <p className="menu-label" style={{fontFamily: "Poppins", fontWeight: "600"}}>
               Emails
             </p>
-            <ul className="menu-list">
+            <ul className="menu-list" style={{overflowY: "scroll", maxHeight: "95vh"}}>
               {
                 emailList.emailSet ?
                 emailList.emailSet.map((email, idx)=> (
