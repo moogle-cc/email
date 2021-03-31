@@ -19,7 +19,7 @@ const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
 const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
-const DEFAULT_FQDN = HOST.startsWith('localhost') ? 'moogle.cc' : HOST;
+const DEFAULT_FQDN = HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
@@ -118,7 +118,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
       return await axios({
-        url: `${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`,
+        url: `${EMAIL_CONTENT_URL}?id=${x}`,
         headers: {'Authorization': authDetails.id_token}
       })
       .then( (response) => {
@@ -135,7 +135,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
-        url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
+        url: `${EMAILS_LIST_URL}?folderpath=/email`,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
