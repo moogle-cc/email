@@ -10,8 +10,9 @@ import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
 import './App.css';
+import WebWorker from './webWorker.js';
+import worker from './worker.js';
 
-const worker_script = require('./worker');
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
 const HOST = (new URL(document.location)).host;
@@ -65,15 +66,13 @@ const App = (props) => {
     title: 'Message',
     description: 'New Emails Availabe Please Refresh',
   }];
-  const myWorker = new Worker(worker_script);
-  setInterval(async () => {
-    myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL})
-  }, 30000);
-  myWorker.onmessage = async (m) => {
-    if(emailList.emailSet && (emailList.emailSet[0].Key !== m.data)){
+
+  const myWorker = new WebWorker(worker);
+  myWorker.addEventListener('message', async (e) => {
+    if(e.data){
       await setShowToast(true);
     }
-  };
+  });
   useEffect(() => {
     if(showToast)
       setTimeout(async ()=> {
@@ -113,6 +112,14 @@ const App = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keys]); 
 
+  useEffect(() => {
+    if(emailList.emailSet){
+      setInterval(async () => {
+        myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL, emailSet: emailList.emailSet});
+      }, 35000);
+    }
+  }, [emailList, fqdn, authDetails, EMAILS_LIST_URL])
+
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
@@ -147,7 +154,8 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        setEmailList({...emailList, emailSet: tempEmailSet, statusMsg: "Hooray! You haven't received any emails today. Lucky you!"})
+        await setEmailList({...emailList, emailSet: tempEmailSet, statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        
       });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })

@@ -1,21 +1,17 @@
 const workercode = () => {
-  this.onmessage = async function(e) {
-    let {fqdn, authDetails, EMAILS_LIST_URL} = e.data;
+  self.addEventListener("message", async function callback(e){ // eslint-disable-line no-restricted-globals
+    let {fqdn, authDetails, EMAILS_LIST_URL, emailSet} = e.data;
     await fetch(`${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,{
       headers: {'Authorization':authDetails.id_token},
     }).then((response)=> response.json())
-    .then(async (response) => {
-      if(response.Contents.length > 0){
-          this.postMessage(response.Contents[0].Key)
+    .then(async (response) => { 
+      console.log("posted")
+      if(response.Contents.length > 0 && emailSet &&response.Contents[0].Key !== emailSet[0].Key){ 
+          postMessage(1)
         };
     })
-  }
+  })
+    
 };
 
-let code = workercode.toString();
-code = code.substring(code.indexOf("{")+1, code.lastIndexOf("}"));
-
-const blob = new Blob([code], {type: "application/javascript"});
-const worker_script = URL.createObjectURL(blob);
-
-module.exports = worker_script;
+export default workercode;
