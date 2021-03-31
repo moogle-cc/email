@@ -74,7 +74,7 @@ const App = (props) => {
   useEffect(() => {
     let interval = setInterval(async () => {
       myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: emailList.emailSet});
-    }, 10000);
+    }, 300000);
     return () => clearInterval(interval);
   });
 
