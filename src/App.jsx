@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Stackedit from 'stackedit-js';
+
 import axios from 'axios';
 import moment from 'moment';
 import AWS from 'aws-sdk';
@@ -8,10 +8,11 @@ import EmailList from './components/emailList';
 import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
+import Toast from './components/toast';
+import worker_script from './worker';
 import './App.css';
 
 const ADDRESS_DELIM = ",";
-const EMAIL_ADDRESS_DELIM = "@";
 const ORIGIN = (new URL(document.location)).origin;
 const HOST = (new URL(document.location)).host;
 const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
@@ -34,17 +35,14 @@ const App = (props) => {
   // const logoutUrl=COGNITO_LOGOUT_URL;
   // const baseUrl = `${ORIGIN}${PATHNAME}`;
   const deviceIsMobile=undefined;
-
+  const [showToast, setShowToast] = useState(false);
   const [emailComposeModalIsVisible, setEmailComposeModalIsVisible] = useState(undefined);
-  const [iframeComposedEmail, setIframeComposedEmail] = useState(undefined);
   const [authDetails, setAuthDetails]= useState(localStorage.userDetails ? JSON.parse(localStorage.userDetails) : undefined);
-  const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
   const [ses, setSes]= useState(undefined);
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
   const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
-  const [textEmailContent, setTextEmailContent]=  useState(undefined);
 
   const [emailList, setEmailList] = useState({
     emailContent: undefined,
@@ -54,20 +52,19 @@ const App = (props) => {
     currentEmailId: undefined,
   });
 
-  const [sendEmailDetails, setSendEmailDetails] = useState({
-    toEmail: undefined,
-    ccEmail: undefined,
-    fromEmail: undefined,
-    sender: undefined,
-    emailSubject: undefined
-  });
-
   const [keys, setKeys] = useState({
     productLicenseKey: undefined,
     secretAccessKey: undefined,
     accessKeyId: undefined,
     region: undefined,
   });
+  const myWorker = new Worker(worker_script);
+  
+  let list = [{
+    id: Math.floor((Math.random() * 101) + 1),
+    title: 'Message',
+    description: 'New Emails Availabe Please Refresh',
+  }];
 
   useEffect(() => {
     if(localStorage.getItem("userDetails") && !authDetails){
@@ -85,85 +82,30 @@ const App = (props) => {
     let tempSesRegions = {"regions":[{"id":"us-east-1","name":"US East","location":"N. Virginia","optIn":false,"visible":true},{"id":"us-east-2","name":"US East","location":"Ohio","optIn":false,"visible":true},{"id":"us-west-1","name":"US West","location":"N. California","optIn":false},{"id":"us-west-2","name":"US West","location":"Oregon","optIn":false,"visible":true},{"id":"af-south-1","name":"Africa","location":"Cape Town","optIn":true},{"id":"ap-east-1","name":"Asia Pacific","location":"Hong Kong","optIn":true},{"id":"ap-south-1","name":"Asia Pacific","location":"Mumbai","optIn":false,"visible":true},{"id":"ap-northeast-2","name":"Asia Pacific","location":"Seoul","optIn":false,"visible":true},{"id":"ap-southeast-1","name":"Asia Pacific","location":"Singapore","optIn":false,"visible":true},{"id":"ap-southeast-2","name":"Asia Pacific","location":"Sydney","optIn":false},{"id":"ap-northeast-1","name":"Asia Pacific","location":"Tokyo","optIn":false,"visible":true},{"id":"ca-central-1","name":"Canada","location":"Central","optIn":false},{"id":"eu-central-1","name":"Europe","location":"Frankfurt","optIn":false,"visible":true},{"id":"eu-west-1","name":"Europe","location":"Ireland","optIn":false,"visible":true},{"id":"eu-west-2","name":"Europe","location":"London","optIn":false,"visible":true},{"id":"eu-south-1","name":"Europe","location":"Milan","optIn":true},{"id":"eu-west-3","name":"Europe","location":"Paris","optIn":false},{"id":"eu-north-1","name":"Europe","location":"Stockholm","optIn":false},{"id":"me-south-1","name":"Middle East","location":"Bahrain","optIn":true},{"id":"sa-east-1","name":"South America","location":"São Paulo","optIn":false,"visible":true}]};
     readLocalData();
     setSesRegions(tempSesRegions);
+    setInterval(async () => {
+      myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL})
+    }, 300000);
+    myWorker.onmessage = async (m) => {
+      if(emailList.emailSet && emailList.emailSet[0].Key !== m.data){
+        await setShowToast(true);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
-  useEffect(() => {
-    if(emailList.currentEmail){
-      clearEmailDestinations();
-      setEmailDestinations();
-    }
-  }, [emailList])
-  
-  useEffect(() => {
-    if(htmlEmailContent){
-      const htmlBlob = new Blob([htmlEmailContent], { type: 'text/html' });
-      setIframeComposedEmail(URL.createObjectURL(htmlBlob));
-    }
-  },[htmlEmailContent]);
 
   useEffect(() => {
     if(authDetails){
       getEmails();
     } 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ authDetails ]);
 
   useEffect(() => {
     getSESObject(true);
     updateLocalData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keys]); 
 
-  const setEmailDestinations=() =>{
-    if(emailList.currentEmail){
-      let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
-      let tempToEmail = makeTo();
-      let tempCcEmail = makeCc();
-      let tempFromEmail = makeFrom()[0];
-      if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
-      if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
-      let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
-      duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
-      tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
-      tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
-      let tempSender = getSender();
-      setSendEmailDetails({sender: tempSender, ccEmail: tempCcEmail, fromEmail: tempFromEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
-    }
-  };
-  const clearEmailDestinations= ()=>{
-    setSendEmailDetails({sender: undefined, ccEmail: undefined, fromEmail: undefined, emailSubject: undefined, toEmail: undefined})
-  };
-
-  const showEmailComposeScreen= (clear) =>{
-        const stackedit = new Stackedit({
-        url: 'https://stackedit.io/app'
-        });
-        let startingText = emailList.currentEmail ? 
-                (emailList.currentEmail.emailContent ? 
-                (emailList.currentEmail.emailContent.text?`\n---------\n${emailList.currentEmail.emailContent.text}`:`<hr>${emailList.currentEmail.emailContent.html}`) 
-                : "Compose your email using markdown.") 
-                : "Compose your email using markdown.";
-        setEmailDestinations();
-        if(clear){
-            startingText = "";
-            clearEmailDestinations();
-        }
-        // Open the iframe
-        stackedit.openFile({
-        name: 'Filename'+Date.now(), // with an optional filename
-        content: {
-            text: startingText
-        }
-        });
-
-        // Listen to StackEdit events and apply the changes to the textarea.
-        stackedit.on('fileChange', (file) => {
-        setHtmlEmailContent(file.content.html);
-        setTextEmailContent(file.content.text)
-        });
-
-        stackedit.on('close', (file) => {
-          setEmailComposeModalIsVisible(true);
-        });
-    };
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
@@ -179,34 +121,6 @@ const App = (props) => {
       });
     }
   };
-  const makeTo = () =>{
-      let toList = makeAddressList(`to`);
-      let from = getSender(`from`);
-      if(toList && from){
-        if(toList.indexOf(from) === -1){
-          toList.push(from);
-        }
-      }
-      return toList;
-    };
-    const makeCc = () =>{
-      let ccList = makeAddressList(`cc`);
-      let from = getSender(`from`);
-      if(ccList && from){
-        if(ccList.indexOf(from) === -1){
-          ccList.push(from);
-        }
-      }
-      return ccList;
-    };
-    const makeFrom = () => {
-      return [...makeAddressList(`to`), ...makeAddressList(`cc`)]
-      .filter(email => email.indexOf(`${EMAIL_ADDRESS_DELIM}${HOST}`) > -1 || email.indexOf(`@ramachandr.in`) > -1);
-    };
-    const getSender=()=>{
-      let from = makeAddressList(`from`);
-      return from && from.length === 1 ? from[0] : undefined;
-    };
 
   const getEmails= async ()=> {
     await setEmailList({...emailList, emailContent: undefined, statusMsg: 'Retrieving...'});
@@ -271,20 +185,6 @@ const App = (props) => {
     copyText.type = 'hidden';
     setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
   };
-
-  const makeAddressList = (type) => {
-    let ec = emailList.currentEmail.emailContent;
-    let key = type.toLowerCase();
-    if([`to`, `cc`, `from`].includes(key) && 
-    ec[key] &&
-    ec[key].value){
-      return ec[key].value.reduce((accum, v) => {
-        accum.push(v.address);
-        return accum;
-      }, []);
-    }
-    return [];
-  };
   
   const friendlyDate=(d)=>{
     return moment(d).fromNow();
@@ -333,8 +233,6 @@ const App = (props) => {
   const redirectToLogin=() =>{
     window.location.href = loginUrl;
   };
-  
-  
 
   // const replyAll=async () =>{
   //   setEmailList({...emailList, statusMsg: 'Composing Reply...'})
@@ -357,7 +255,8 @@ const App = (props) => {
   return (
     <div className="App">
       <form id="email-contents">
-      <Navbar getEmails={getEmails} showEmailComposeScreen={showEmailComposeScreen} authTokenIsValid={authTokenIsValid} 
+      {showToast ? <Toast toastList={list} /> : null}
+      <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
         setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} />
       <div className="columns">
         <div className="column is-one-quarter">
@@ -368,9 +267,9 @@ const App = (props) => {
         </div>
         <div className="column is-one-quarter is-size-5 primary-background">
           {/* <!-- email actions--> */}
-          <button className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</button>
+          <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
-          <button className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></button>
+          <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
@@ -380,10 +279,8 @@ const App = (props) => {
         deviceIsMobile={deviceIsMobile} keys={keys} setKeys={setKeys} sesRegions={sesRegions} 
         setDataMustBeSavedLocally={setDataMustBeSavedLocally} />
 
-      <EmailComposeModal textEmailContent={textEmailContent} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} 
-        showEmailComposeScreen={showEmailComposeScreen} deviceIsMobile={deviceIsMobile} htmlEmailContent={htmlEmailContent} 
-        iframeComposedEmail={iframeComposedEmail} ADDRESS_DELIM={ADDRESS_DELIM} sendEmailDetails={sendEmailDetails} 
-        setSendEmailDetails={setSendEmailDetails} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
+      <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} HOST={HOST} emailList={emailList}
+        deviceIsMobile={deviceIsMobile} ADDRESS_DELIM={ADDRESS_DELIM} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
     </form>
     </div>
   )
