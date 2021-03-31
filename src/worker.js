@@ -1,17 +1,13 @@
-const workercode = () => {
-  self.addEventListener("message", async function callback(e){ // eslint-disable-line no-restricted-globals
-    let {fqdn, authDetails, EMAILS_LIST_URL, emailSet} = e.data;
+export const fetchList = async (data) => { // eslint-disable-line no-restricted-globals
+    let {fqdn, authDetails, EMAILS_LIST_URL, emailSet} = data;
+    const newEmailFound = true;
     await fetch(`${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,{
       headers: {'Authorization':authDetails.id_token},
     }).then((response)=> response.json())
     .then(async (response) => { 
       console.log("posted")
       if(response.Contents.length > 0 && emailSet &&response.Contents[0].Key !== emailSet[0].Key){ 
-          postMessage(1)
+          postMessage(newEmailFound);
         };
     })
-  })
-    
 };
-
-export default workercode;
