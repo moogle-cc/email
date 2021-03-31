@@ -1,6 +1,6 @@
 import React from 'react'; 
 
-const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModalIsVisible, awsCredentialsAreAvailable}) => {
+const Navbar = ({getEmails, setEmailComposeModalIsVisible, authTokenIsValid, setAwsModalIsVisible, awsCredentialsAreAvailable}) => {
 
     return  (
         <nav className="container navbar" role="navigation" aria-label="main navigation">
@@ -20,19 +20,19 @@ const Navbar = ({getEmails, showEmailComposeScreen, authTokenIsValid, setAwsModa
               authTokenIsValid() ?
               <div className="navbar-item">
                 
-                <button className="navbar-item button secondary-icon-style"  onClick={(e) =>{e.preventDefault(); getEmails()}}>
-                <span className="icon"><i class="fas fa-sync "></i> </span> <span>Refresh Email List </span>
-                </button>
-                <button className="navbar-item button secondary-icon-style" onClick={(e)=> {e.preventDefault(); showEmailComposeScreen(true)}}>
+                <a role="button" href="/" className="navbar-item button secondary-icon-style"  onClick={(e) =>{e.preventDefault(); getEmails()}}>
+                <span className="icon"><i className="fas fa-sync "></i> </span> <span>Refresh Email List </span>
+                </a>
+                <a role="button" href="/" className="navbar-item button secondary-icon-style" onClick={(e)=> {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>
                   <span className="icon"><i className="far fa-edit "></i> </span> <span>Compose </span>
-                </button>
+                </a>
               </div> 
               
               :null
             }
             
             <div className="navbar-item">
-              <button className="navbar-item button secondary-icon-style" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</button>
+              <a role="button" href="/" className="navbar-item button secondary-icon-style" onClick={(e) => {e.preventDefault(); setAwsModalIsVisible(true)}}>{!awsCredentialsAreAvailable() ? "Add AWS Credentials" : "Change AWS Credentials"}</a>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
     useEffect(() => {
       if(emailList.emailSet)
         showEmail(emailList.emailSet[0].Key);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
 
     const showEmail=(emlId)=>{

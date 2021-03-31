@@ -20,7 +20,7 @@ const AwsCredentialModal = ({awsModalIsVisible, setAwsModalIsVisible, deviceIsMo
               <div className="container">
                 <div className="field is-block">
                   <div className="control">
-                    <input className="input" type="password" placeholder="AWS Access Key Id " value={keys.accessKeyId} name="accessKeyId" onChange={(e)=> handleChange} />
+                    <input className="input" type="password" placeholder="AWS Access Key Id " value={keys.accessKeyId} name="accessKeyId" onChange={handleChange} />
                     {keys.accessKeyId ? <sub >***{keys.accessKeyId.substring(keys.accessKeyId.length - 5)}</sub> : null}
                   </div>
                 </div>
@@ -35,13 +35,13 @@ const AwsCredentialModal = ({awsModalIsVisible, setAwsModalIsVisible, deviceIsMo
                     {
                       sesRegions ? 
                       <div className="select is-primary" >
-                        <select name="region" onChage={handleChange}>
-                          <option disabled value="">Select AWS region</option>
+                        <select name="region" onChange={handleChange}>
+                          <option disabled value={keys.region}>Select AWS region</option>
                           {
                             sesRegions.regions.map((sesRegion) => 
                               {
                                 if(sesRegion.visible)
-                                  return (<option selected={sesRegion.id === keys.region ? true :false} value={sesRegion.id}>{sesRegion.name} - {sesRegion.location}</option>)
+                                  return (<option key={sesRegion.id} value={sesRegion.id}>{sesRegion.name} - {sesRegion.location}</option>)
                                 else return null;
                               }
                             )}

@@ -1,9 +1,141 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import Stackedit from 'stackedit-js';
 
-const EmailComposeModal = ({textEmailContent, setEmailComposeModalIsVisible, showEmailComposeScreen, deviceIsMobile, htmlEmailContent, iframeComposedEmail,ADDRESS_DELIM, sendEmailDetails,  setSendEmailDetails, ses, emailComposeModalIsVisible}) => {
-    const bccEmail = undefined;
+const EMAIL_ADDRESS_DELIM = "@";
+
+const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ADDRESS_DELIM, ses, HOST, emailComposeModalIsVisible}) => {
+    const [sendEmailDetails, setSendEmailDetails] = useState({
+      toEmail: undefined,
+      ccEmail: undefined,
+      fromEmail: undefined,
+      sender: undefined,
+      emailSubject: undefined,
+      bccEmail: undefined
+    });
+    const [textEmailContent, setTextEmailContent]=  useState(undefined);
+    const [iframeComposedEmail, setIframeComposedEmail] = useState(undefined);
+    const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
     const [emailSendStatus, setEmailSendStatus] = useState(undefined);
     const [emailSendStatusMessage, setEmailSendStatusMessage]= useState(undefined);
+
+    useEffect(() => {
+      if(emailComposeModalIsVisible)
+        showEmailComposeScreen(emailComposeModalIsVisible);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[emailComposeModalIsVisible])
+
+    useEffect(() => {
+      if(emailList.currentEmail){
+        clearEmailDestinations();
+        setEmailDestinations();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [emailList.currentEmail])
+
+    useEffect(() => {
+      if(htmlEmailContent){
+        const htmlBlob = new Blob([htmlEmailContent], { type: 'text/html' });
+        setIframeComposedEmail(URL.createObjectURL(htmlBlob));
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[htmlEmailContent]);
+
+    const showEmailComposeScreen= (clear) =>{
+      const stackedit = new Stackedit({
+      url: 'https://stackedit.io/app'
+      });
+      let startingText = emailList.currentEmail ? 
+              (emailList.currentEmail.emailContent ? 
+              (emailList.currentEmail.emailContent.text?`\n---------\n${emailList.currentEmail.emailContent.text}`:`<hr>${emailList.currentEmail.emailContent.html}`) 
+              : "Compose your email using markdown.") 
+              : "Compose your email using markdown.";
+      setEmailDestinations();
+        if(clear){
+            startingText = "";
+            clearEmailDestinations();
+        }
+        // Open the iframe
+        stackedit.openFile({
+        name: 'Filename'+Date.now(), // with an optional filename
+        content: {
+            text: startingText
+        }
+        });
+
+        // Listen to StackEdit events and apply the changes to the textarea.
+        stackedit.on('fileChange', (file) => {
+        setHtmlEmailContent(file.content.html);
+        setTextEmailContent(file.content.text)
+        });
+
+        stackedit.on('close', (file) => {
+          setEmailComposeModalIsVisible(true);
+        });
+    };
+
+    const setEmailDestinations=() =>{
+      if(emailList.currentEmail){
+        let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
+        let tempToEmail = makeTo();
+        let tempCcEmail = makeCc();
+        let tempFromEmail = makeFrom()[0];
+        if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
+        if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
+        let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
+        duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
+        tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
+        tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
+        let tempSender = getSender();
+        setSendEmailDetails({sender: tempSender, ccEmail: tempCcEmail, fromEmail: tempFromEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
+      }
+    };
+    const clearEmailDestinations= ()=>{
+      setSendEmailDetails({sender: undefined, ccEmail: undefined, fromEmail: undefined, emailSubject: undefined, toEmail: undefined})
+    };
+
+    const makeTo = () =>{
+      let toList = makeAddressList(`to`);
+      let from = getSender(`from`);
+      if(toList && from){
+        if(toList.indexOf(from) === -1){
+          toList.push(from);
+        }
+      }
+      return toList;
+    };
+
+    const makeCc = () =>{
+      let ccList = makeAddressList(`cc`);
+      let from = getSender(`from`);
+      if(ccList && from){
+        if(ccList.indexOf(from) === -1){
+          ccList.push(from);
+        }
+      }
+      return ccList;
+    };
+    const makeFrom = () => {
+      return [...makeAddressList(`to`), ...makeAddressList(`cc`)]
+      .filter(email => email.indexOf(`${EMAIL_ADDRESS_DELIM}${HOST}`) > -1 || email.indexOf(`@ramachandr.in`) > -1);
+    };
+    const getSender=()=>{
+      let from = makeAddressList(`from`);
+      return from && from.length === 1 ? from[0] : undefined;
+    };
+
+    const makeAddressList = (type) => {
+      let ec = emailList.currentEmail.emailContent;
+      let key = type.toLowerCase();
+      if([`to`, `cc`, `from`].includes(key) && 
+      ec[key] &&
+      ec[key].value){
+        return ec[key].value.reduce((accum, v) => {
+          accum.push(v.address);
+          return accum;
+        }, []);
+      }
+      return [];
+    };
 
     const sendEmail= async (event) => {
         if(sendEmailDetails.toEmail && sendEmailDetails.sender){
@@ -17,8 +149,8 @@ const EmailComposeModal = ({textEmailContent, setEmailComposeModalIsVisible, sho
                 sendEmailDetails.ccEmail,
                 /* more items */
               ],
-              BccAddresses: bccEmail && bccEmail.split(ADDRESS_DELIM).length > 0 ? bccEmail.split(ADDRESS_DELIM) : [
-                bccEmail,
+              BccAddresses: sendEmailDetails.bccEmail && sendEmailDetails.bccEmail.split(ADDRESS_DELIM).length > 0 ? sendEmailDetails.bccEmail.split(ADDRESS_DELIM) : [
+                sendEmailDetails.bccEmail,
                 /* more items */
               ],
             },
@@ -120,7 +252,7 @@ const EmailComposeModal = ({textEmailContent, setEmailComposeModalIsVisible, sho
                 </div>
                 <div className="field">
                     <div className="control">
-                    <embed height="100vh" width="100vw" src={iframeComposedEmail} onClick={(e) => {e.preventDefault(); showEmailComposeScreen()}} style={{overflow:'hidden',overflowX:'hidden',overflowY:'hidden',height:'100vh',width:'100%'}} >
+                      <embed height="100vh" width="100vw" src={iframeComposedEmail} onClick={(e) => {e.preventDefault(); showEmailComposeScreen()}} style={{overflow:'hidden',overflowX:'hidden',overflowY:'hidden',height:'100vh',width:'100%'}} >
                     </embed>
                     </div>
                 </div>
