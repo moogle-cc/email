@@ -75,6 +75,13 @@ const App = (props) => {
     }
   };
   useEffect(() => {
+    if(showToast)
+      setTimeout(async ()=> {
+        await setShowToast(false)
+      }, 35000)
+  }, [showToast]);
+
+  useEffect(() => {
     if(localStorage.getItem("userDetails") && !authDetails){
       let details = JSON.parse(localStorage.userDetails);
       const tem = async(details) => {
@@ -255,7 +262,7 @@ const App = (props) => {
   return (
     <div className="App">
       <form id="email-contents">
-      {showToast ? <Toast toastList={list} /> : null}
+      {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
       <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
         setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} />
       <div className="columns">
