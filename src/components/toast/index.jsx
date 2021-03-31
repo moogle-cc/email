@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import './toast.css';
 
 const Toast = props => {
-    const { toastList } = props;
+    const { toastList, setShowToast } = props;
     const [list, setList] = useState(toastList);
-    const dismissTime = 3500;
+    const dismissTime = 35000;
     const autoDelete = true;
     useEffect(() => {
         setList([...toastList]);
@@ -25,11 +25,12 @@ const Toast = props => {
         // eslint-disable-next-line
     }, [toastList, autoDelete, dismissTime, list]);
 
-    const deleteToast = id => {
+    const deleteToast = async id => {
         const listItemIndex = list.findIndex(e => e.id === id);
         const toastListItem = toastList.findIndex(e => e.id === id);
         list.splice(listItemIndex, 1);
         toastList.splice(toastListItem, 1);
+        await setShowToast(false);
         setList([...list]);
     }
 
