@@ -5,9 +5,9 @@ export const fetchList = async (data) => { // eslint-disable-line no-restricted-
       headers: {'Authorization':authDetails.id_token},
     }).then((response)=> response.json())
     .then(async (response) => { 
-      console.log("posted")
-      if(response.Contents.length > 0 && emailSet &&response.Contents[0].Key !== emailSet[0].Key){ 
-          postMessage(newEmailFound);
+      if(response.Contents.length > 0 && emailSet && response.Contents[0].Key !== emailSet[0].Key){ 
+        console.log("new email found")
+          postMessage({newEmailFound});
         };
     })
 };
