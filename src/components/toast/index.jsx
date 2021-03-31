@@ -5,7 +5,7 @@ import './toast.css';
 const Toast = props => {
     const { toastList } = props;
     const [list, setList] = useState(toastList);
-    const dismissTime = 3500;
+    const dismissTime = 35000;
     const autoDelete = true;
     useEffect(() => {
         setList([...toastList]);
