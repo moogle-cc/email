@@ -8,8 +8,9 @@ import EmailList from './components/emailList';
 import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
-import './App.css';
+import Toast from './components/toast';
 import worker_script from './worker';
+import './App.css';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -34,7 +35,7 @@ const App = (props) => {
   // const logoutUrl=COGNITO_LOGOUT_URL;
   // const baseUrl = `${ORIGIN}${PATHNAME}`;
   const deviceIsMobile=undefined;
-
+  const [showToast, setShowToast] = useState(false);
   const [emailComposeModalIsVisible, setEmailComposeModalIsVisible] = useState(undefined);
   const [authDetails, setAuthDetails]= useState(localStorage.userDetails ? JSON.parse(localStorage.userDetails) : undefined);
   const [ses, setSes]= useState(undefined);
@@ -57,18 +58,15 @@ const App = (props) => {
     accessKeyId: undefined,
     region: undefined,
   });
-  var myWorker = new Worker(worker_script);
+  const myWorker = new Worker(worker_script);
   
-  
+  let list = [{
+    id: Math.floor((Math.random() * 101) + 1),
+    title: 'Message',
+    description: 'New Emails Availabe Please Refresh',
+  }];
+
   useEffect(() => {
-    setInterval(() => {
-      myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL})
-    }, 100000);
-    myWorker.onmessage = (m) => {
-      if(emailList.emailSet && emailList.emailSet[0].Key !== m.data){
-        alert("new Email Please Refreash");
-      }
-    };
     if(localStorage.getItem("userDetails") && !authDetails){
       let details = JSON.parse(localStorage.userDetails);
       const tem = async(details) => {
@@ -84,6 +82,14 @@ const App = (props) => {
     let tempSesRegions = {"regions":[{"id":"us-east-1","name":"US East","location":"N. Virginia","optIn":false,"visible":true},{"id":"us-east-2","name":"US East","location":"Ohio","optIn":false,"visible":true},{"id":"us-west-1","name":"US West","location":"N. California","optIn":false},{"id":"us-west-2","name":"US West","location":"Oregon","optIn":false,"visible":true},{"id":"af-south-1","name":"Africa","location":"Cape Town","optIn":true},{"id":"ap-east-1","name":"Asia Pacific","location":"Hong Kong","optIn":true},{"id":"ap-south-1","name":"Asia Pacific","location":"Mumbai","optIn":false,"visible":true},{"id":"ap-northeast-2","name":"Asia Pacific","location":"Seoul","optIn":false,"visible":true},{"id":"ap-southeast-1","name":"Asia Pacific","location":"Singapore","optIn":false,"visible":true},{"id":"ap-southeast-2","name":"Asia Pacific","location":"Sydney","optIn":false},{"id":"ap-northeast-1","name":"Asia Pacific","location":"Tokyo","optIn":false,"visible":true},{"id":"ca-central-1","name":"Canada","location":"Central","optIn":false},{"id":"eu-central-1","name":"Europe","location":"Frankfurt","optIn":false,"visible":true},{"id":"eu-west-1","name":"Europe","location":"Ireland","optIn":false,"visible":true},{"id":"eu-west-2","name":"Europe","location":"London","optIn":false,"visible":true},{"id":"eu-south-1","name":"Europe","location":"Milan","optIn":true},{"id":"eu-west-3","name":"Europe","location":"Paris","optIn":false},{"id":"eu-north-1","name":"Europe","location":"Stockholm","optIn":false},{"id":"me-south-1","name":"Middle East","location":"Bahrain","optIn":true},{"id":"sa-east-1","name":"South America","location":"São Paulo","optIn":false,"visible":true}]};
     readLocalData();
     setSesRegions(tempSesRegions);
+    setInterval(async () => {
+      myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL})
+    }, 300000);
+    myWorker.onmessage = async (m) => {
+      if(emailList.emailSet && emailList.emailSet[0].Key !== m.data){
+        await setShowToast(true);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -249,6 +255,7 @@ const App = (props) => {
   return (
     <div className="App">
       <form id="email-contents">
+      {showToast ? <Toast toastList={list} /> : null}
       <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
         setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} />
       <div className="columns">

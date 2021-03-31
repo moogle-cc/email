@@ -1,0 +1,122 @@
+.notification-container {
+	font-size: 14px;
+	box-sizing: border-box;
+	position: fixed;
+	z-index: 999999
+}
+
+.top-right {
+	top: 12px;
+	right: 12px;
+	transition: transform .6s ease-in-out;
+	animation: toast-in-right .7s;
+}
+
+.notification {
+	background: #fff;
+	transition: .3s ease;
+	position: relative;
+	pointer-events: auto;
+	overflow: hidden;
+	margin: 0 0 6px;
+	padding: 30px;
+	margin-bottom: 15px;
+	width: 300px;
+	max-height: 100px;
+	border-radius: 5px 5px 5px 5px;
+	/* box-shadow: 2px 2px 5px 2px #9013FE; */
+	color: #000;
+	opacity: .9;
+	background-position: 15px;
+	background-repeat: no-repeat;
+}
+
+.notification:hover {
+	box-shadow: 0 0 12px #fff;
+	opacity: 1;
+	cursor: pointer
+}
+
+.notification-title {
+	font-weight: 700;
+	font-size: 16px;
+	text-align: left;
+	margin-top: 0;
+	margin-bottom: 6px;
+    width: 300px;
+    height: 18px;
+}
+
+.notification-message {
+	margin: 0;
+	text-align: left;
+    height: 18px;
+    margin-left: -1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* .notification-image {
+    float: left;
+    margin-right: 15px;
+}
+
+.notification-image img {
+    width: 30px;
+    height: 30px;
+} */
+
+.toast {
+	background-color: #003862;
+    height: fit-content;
+    width: 365px;
+	color: #fff;
+	padding: 15px 15px 10px 10px;
+}
+
+.notification-container button {
+	position: relative;
+	font-weight: 700;
+	color: #fff;
+	outline: none;
+	border: none;
+	text-shadow: 0 1px 0 #fff;
+	opacity: .8;
+	line-height: 1;
+	font-size: 16px;
+	padding: 0;
+	cursor: pointer;
+	background: 0 0;
+	border: 0
+}
+
+@keyframes toast-in-right {
+	from {
+	  transform: translateX(100%);
+	  
+	}
+	to {
+	  transform: translateX(0);
+	}
+}
+
+@media screen and (max-width: 992px){
+	.top-right {
+		/* top: 12px; */
+		right: 2px;
+		transition: transform .6s ease-in-out;
+		animation: toast-in-right .7s;
+	}
+}
+@media screen and (max-width: 420px){
+	.top-right {
+		/* top: 12px; */
+		/* right: 2px; */
+		transition: transform .6s ease-in-out;
+		animation: toast-in-right .7s;
+	}
+	.toast{
+		width: 300px;
+	}
+}
