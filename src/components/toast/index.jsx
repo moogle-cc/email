@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './toast.css';
 
 const Toast = props => {
-    const { toastList, setShowToast } = props;
+    const { toastList, setShowToast} = props;
     const [list, setList] = useState(toastList);
     const dismissTime = 35000;
     const autoDelete = true;
@@ -30,8 +30,8 @@ const Toast = props => {
         const toastListItem = toastList.findIndex(e => e.id === id);
         list.splice(listItemIndex, 1);
         toastList.splice(toastListItem, 1);
-        await setShowToast(false);
         setList([...list]);
+        setShowToast(false);
     }
 
     return (

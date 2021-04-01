@@ -10,8 +10,8 @@ import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
 import './App.css';
+import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 
-const worker_script = require('./worker');
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
 const HOST = (new URL(document.location)).host;
@@ -26,6 +26,7 @@ const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
 const CLIENT_ID = '365ebnulu59p2fkp1m6dl0v6gd';
 const RESPONSE_TYPE = 'token';
 const SCOPE = 'email+openid';
+const NEW_EMAIL_CHECKOUT_TIME = 300000;
 const COGNITO_LOGIN_URL = `${COGNITO_URL}/login?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${LOGIN_REDIRECT_URL}`;
 // const COGNITO_LOGOUT_URL = `${COGNITO_URL}/logout?client_id=${CLIENT_ID}&logout_uri=${LOGOUT_REDIRECT_URL}`;
 
@@ -65,21 +66,18 @@ const App = (props) => {
     title: 'Message',
     description: 'New Emails Availabe Please Refresh',
   }];
-  const myWorker = new Worker(worker_script);
-  setInterval(async () => {
-    myWorker.postMessage({fqdn, authDetails, EMAILS_LIST_URL})
-  }, 30000);
-  myWorker.onmessage = async (m) => {
-    if(emailList.emailSet && (emailList.emailSet[0].Key !== m.data)){
+
+  const myWorker = worker();
+  myWorker.addEventListener('message', async (e) => {
+    if(e.data.NEW_EMAIL_WAS_FOUND)
       await setShowToast(true);
-    }
-  };
+  });
   useEffect(() => {
-    if(showToast)
-      setTimeout(async ()=> {
-        await setShowToast(false)
-      }, 35000)
-  }, [showToast]);
+    let interval = setInterval(async () => {
+      myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: emailList.emailSet});
+    }, NEW_EMAIL_CHECKOUT_TIME);
+    return () => clearInterval(interval);
+  });
 
   useEffect(() => {
     if(localStorage.getItem("userDetails") && !authDetails){
@@ -147,7 +145,8 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        setEmailList({...emailList, emailSet: tempEmailSet, statusMsg: "Hooray! You haven't received any emails today. Lucky you!"})
+        await setEmailList({...emailList, emailSet: tempEmailSet, statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        
       });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
