@@ -9,8 +9,10 @@ import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
-import './App.css';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
+import CommentForm from './components/commentForm';
+import CommentList from './components/commentList';
+import './App.css';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -19,7 +21,7 @@ const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
 const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
-const DEFAULT_FQDN = HOST;
+const DEFAULT_FQDN = HOST.startsWith('localhost') ? 'moogle.cc' : HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
@@ -115,7 +117,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
       return await axios({
-        url: `${EMAIL_CONTENT_URL}?id=${x}`,
+        url: `${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`,
         headers: {'Authorization': authDetails.id_token}
       })
       .then( (response) => {
@@ -132,7 +134,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
-        url: `${EMAILS_LIST_URL}?folderpath=/email`,
+        url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
@@ -271,7 +273,7 @@ const App = (props) => {
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
-        <div className="column is-one-quarter is-size-5 primary-background">
+        <div className="column  primary-background mx-2">
           {/* <!-- email actions--> */}
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
@@ -279,6 +281,11 @@ const App = (props) => {
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
+          {/* comment */}
+          <div className="comments-container mt-4">
+              <CommentForm />
+              <CommentList />
+          </div>
         </div>
       </div>
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 

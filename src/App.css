@@ -9,3 +9,7 @@
     font-family: 'Poppins';
     font-weight: bold;
 }
+.button:hover {
+    color:blue;
+    background-color: white;;
+}
