@@ -69,7 +69,7 @@ const App = (props) => {
 
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
-    if(e.data.newEmailFound)
+    if(e.data.NEW_EMAIL_WAS_FOUND)
       await setShowToast(true);
   });
   useEffect(() => {
