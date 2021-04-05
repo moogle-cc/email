@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const moment = require('moment');
+const URL = require('url').URL;
 AWS.config.update({region: 'us-east-1'});
 
 var s3 = new AWS.S3({signatureVersion: 'v4'});
@@ -16,30 +17,50 @@ const createResponse = (status, body) => {
 
 const EMOJI_REGEX = /\p{Emoji_Presentation}/gu;
 
+let getDomain = (event) => {
+    let d = event.headers.origin || event.headers.referer || undefined;
+    if(d){
+      let host = (new URL(d)).hostname;
+      if(host === 'localhost') return process.env.DEFAULT_EMAIL_DOMAIN;
+      return host;
+    }
+    return undefined;
+};
+
 exports.handler = async (event) => {
+    console.log(event);
     if(eventIsValid(event)){
         switch (event.httpMethod.toUpperCase()){
             case 'POST':
-                let body = JSON.parse(event.body.replace(EMOJI_REGEX, ''));
-                return await writeCommentToS3(body)
-                .then(r => {
-                    return createResponse(r ? 200 : 400, {msg: (`comment ${r ? 'saved' : 'ignored'}`)});
-                })
-                .catch(e => {
-                    return createResponse();
-                });
+                let domain = getDomain(event);
+                if(domain){
+                    let body = JSON.parse(event.body.replace(EMOJI_REGEX, ''));
+                    console.log(body);
+                    let bucket = process.env.EMAIL_BUCKET;
+                    let commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
+                    return await writeCommentToS3(bucket, domain, commentsPrefix, body)
+                    .then(r => {
+                        return createResponse(r ? 200 : 400, {msg: (`comment ${r ? 'saved' : 'ignored'}`)});
+                    })
+                    .catch(e => {
+                        console.log(e);
+                        return createResponse();
+                    });
+                }
+                console.log(`No domain found in event headers`);
+                return createResponse();
         }
     }
     return createResponse(400, {msg: 'invalid data'});
 };
 
-let writeCommentToS3 = async (body) => {
+let writeCommentToS3 = async (bucket, domain, commentsPrefix, body) => {
     if(body.thread_identifier){
         let comment_id = getS3FileDatePrefix(undefined, undefined, true);
         body.comment_id = comment_id;
         return await s3.putObject({
-            Bucket: EMAIL_COMMENTS_LOCATION,
-            Key: `comments/${body.thread_identifier}-${body.comment_id}.json`,
+            Bucket: bucket,
+            Key: `${domain}/${commentsPrefix}/${body.thread_identifier}-${body.comment_id}.json`,
             Body: JSON.stringify(body),
             ContentType: `application/json`})
             .promise()
