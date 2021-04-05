@@ -25,9 +25,6 @@ exports.handler = async (event) => {
                 .then(r => {
                     return createResponse(r ? 200 : 400, {msg: (`comment ${r ? 'saved' : 'ignored'}`)});
                 })
-                .catch(e => {
-                    return createResponse();
-                });
         }
     }
     return createResponse(400, {msg: 'invalid data'});
@@ -38,8 +35,8 @@ let writeCommentToS3 = async (body) => {
         let comment_id = getS3FileDatePrefix(undefined, undefined, true);
         body.comment_id = comment_id;
         return await s3.putObject({
-            Bucket: REDIRECT_FILES_LOCATION,
-            Key: `/comments/${body.thread_identifier}${comment_id}.json`,
+            Bucket: EMAIL_COMMENTS_LOCATION,
+            Key: `comments/${body.thread_identifier}-${body.comment_id}.json`,
             Body: JSON.stringify(body),
             ContentType: `application/json`})
             .promise()
@@ -48,7 +45,7 @@ let writeCommentToS3 = async (body) => {
     }
 };
 
-const REDIRECT_FILES_LOCATION = process.env.REDIRECT_FILES_LOCATION;
+const EMAIL_COMMENTS_LOCATION = process.env.EMAIL_COMMENTS_LOCATION;
 const COMMENT_BODY_FIELDS = [
 'thread_identifier', //this value should be the email_id
 'comment_id', //'NEW' or <existing-id>
@@ -71,7 +68,7 @@ let eventIsValid = (event) => {
             case 'POST':
                 if(!event.body) return false;
                 let body = JSON.parse(event.body);
-                let notInBody = COMMENT_BODY_FIELDS.find(f => f=='comment_id' ? false : !Object.keys(body).includes(f));
+                let notInBody = COMMENT_BODY_FIELDS.find(f => f==='comment_id' ? false : !Object.keys(body).includes(f));
                 if(!notInBody){
                     return true;
                 }
