@@ -9,8 +9,10 @@ import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
-import './App.css';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
+import CommentForm from './components/commentForm';
+import CommentList from './components/commentList';
+import './App.css';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -271,7 +273,7 @@ const App = (props) => {
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
-        <div className="column is-one-quarter is-size-5 primary-background">
+        <div className="column  primary-background mx-2">
           {/* <!-- email actions--> */}
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
@@ -279,6 +281,11 @@ const App = (props) => {
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
+          {/* comment */}
+          <div className="comments-container mt-4">
+              <CommentForm />
+              <CommentList />
+          </div>
         </div>
       </div>
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 
