@@ -21,7 +21,7 @@ const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
 const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
-const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comments`;
+const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comment`;
 const DEFAULT_FQDN = HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
@@ -148,7 +148,7 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        await setEmailList({...emailList, emailSet: tempEmailSet, statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        await setEmailList({...emailList, emailSet: tempEmailSet,currentEmail: tempEmailSet[0],currentEmailId: tempEmailSet[0].Key,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
     } else {
