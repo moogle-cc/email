@@ -25,6 +25,9 @@ exports.handler = async (event) => {
                 .then(r => {
                     return createResponse(r ? 200 : 400, {msg: (`comment ${r ? 'saved' : 'ignored'}`)});
                 })
+                .catch(e => {
+                    return createResponse();
+                });
         }
     }
     return createResponse(400, {msg: 'invalid data'});
@@ -40,8 +43,7 @@ let writeCommentToS3 = async (body) => {
             Body: JSON.stringify(body),
             ContentType: `application/json`})
             .promise()
-        .then(d => d)
-        .catch(ex => console.log(ex));
+        .then(d => d);
     }
 };
 
