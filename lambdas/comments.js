@@ -70,8 +70,9 @@ let eventIsValid = (event) => {
             case 'POST':
                 if(!event.body) return false;
                 let body = JSON.parse(event.body);
+                let validBodySize = COMMENT_BODY_FIELDS.length() === Object.keys(body).length();
                 let notInBody = COMMENT_BODY_FIELDS.find(f => f==='comment_id' ? false : !Object.keys(body).includes(f));
-                if(!notInBody){
+                if(!notInBody && validBodySize){
                     return true;
                 }
                 return false;
