@@ -1,36 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MarkdownView from 'react-showdown';
+import axios from 'axios';
 
-const CommentForm = () => {
+const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
     const [commentData, setCommentData] = useState({
-        name: "",
-        body: "",
+        'thread_identifier': "",
+        'update_type': "NEW",
+        'commenter_name': "",
+        'commenter_id': "",
+        'commented_at': "",
+        'html_part': "",
+        'text_part': "",
     });
+    useEffect(() => {
+        let idToken = JSON.parse(localStorage.userDetails).id_token;
+        let userDetails = JSON.parse(atob(idToken.split('.')[1]));
+        setCommentData({...commentData, commenter_name: userDetails["cognito:username"], commenter_id: userDetails.email,thread_identifier: currentEmailId});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const handleChange =(e) => {
+    const handleChange =async (e) => {
         const {name, value} = e.target;
-        setCommentData({...commentData, [name]: value})
+        
+        await setCommentData({...commentData, [name]: value});
+    }
+    const handleSubmit = async(e) => {
+        await e.preventDefault();
+        let commented_at = new Date().getTime();
+        let idToken = JSON.parse(localStorage.userDetails).id_token;
+        const html_part = await document.getElementById("comment-markdown-view").innerHTML;
+        // console.log({...commentData, commented_at, html_part});
+        await axios({
+            url: `${COMMENT_POST_URL}`,
+            headers: {'Authorization': idToken},
+            method: "POST",
+            body: {...commentData, commented_at}
+          })
+          .then(async (response) => {
+            console.log(response);
+          });
     }
     return (
         <form>
             <div className="field">
                 <label className="label">Name</label>
                 <div className="control">
-                    <input className="input" type="text" placeholder="Your Name" />
+                    <input className="input" type="text" name="commenter_name" value={commentData.commenter_name} placeholder="Your Name" onChange={handleChange}/>
                 </div>
             </div>
             <div className="field">
                 <label className="label">Your Comment</label>
                 <div className="control">
-                    <textarea className="textarea" name="body" value={commentData.body} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
+                    <textarea className="textarea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
                 </div>
             </div>
             <div >
-                <button className="button is-full secondary-icon-style" style={{width: "90%"}}>Submit</button>  
+                <button className="button is-full secondary-icon-style" style={{width: "90%"}} onClick={handleSubmit}>Submit</button>  
                 <i onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}}className="fas fa-info-circle" style={{fontSize: "1.2em"}}></i>
             </div>
             
-            <MarkdownView markdown={commentData.body || "You can see your comment preview here"}/>     
+            <MarkdownView id="comment-markdown-view" markdown={commentData.text_part || "You can see your comment preview here"}/>     
             <div className={isModalVisible ? "modal is-active" : "modal"}>
                 <div className="modal-background"></div>
                 <div className="modal-card">
