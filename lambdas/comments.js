@@ -50,7 +50,6 @@ let writeCommentToS3 = async (body) => {
 const EMAIL_COMMENTS_LOCATION = process.env.EMAIL_COMMENTS_LOCATION;
 const COMMENT_BODY_FIELDS = [
 'thread_identifier', //this value should be the email_id
-'comment_id', //'NEW' or <existing-id>
 'update_type', //'NEW' | 'DELETE'
 'commenter_name',
 'commenter_id',
@@ -73,7 +72,7 @@ let eventIsValid = (event) => {
                 let extraBodyFieldWasFound = Object.keys(body).find((key) => {
                     !COMMENT_BODY_FIELDS.includes(key);
                 });
-                let notInBody = COMMENT_BODY_FIELDS.find(f => f==='comment_id' ? false : !Object.keys(body).includes(f));
+                let notInBody = COMMENT_BODY_FIELDS.find(f => !Object.keys(body).includes(f));
                 if(!notInBody && !extraBodyFieldWasFound){
                     return true;
                 }
