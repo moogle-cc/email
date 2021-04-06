@@ -44,7 +44,7 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
             <div className="field">
                 <label className="label">Name</label>
                 <div className="control">
-                    <input className="input" type="text" name="commenter_name" value={commentData.commenter_name} placeholder="Your Name" onChange={handleChange}/>
+                    <input className="input" type="text" name="commenter_name" value={commentData.commenter_name} readOnly/>
                 </div>
             </div>
             <div className="field">
