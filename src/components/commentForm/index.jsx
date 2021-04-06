@@ -17,11 +17,10 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
         let userDetails = JSON.parse(atob(idToken.split('.')[1]));
         setCommentData({...commentData, commenter_name: userDetails["cognito:username"], commenter_id: userDetails.email,thread_identifier: currentEmailId});
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [currentEmailId]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleChange =async (e) => {
         const {name, value} = e.target;
-        
         await setCommentData({...commentData, [name]: value});
     }
     const handleSubmit = async(e) => {
@@ -34,7 +33,7 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
             url: `${COMMENT_POST_URL}`,
             headers: {'Authorization': idToken},
             method: "POST",
-            body: {...commentData, commented_at}
+            body: {...commentData, commented_at, html_part}
           })
           .then(async (response) => {
             console.log(response);
