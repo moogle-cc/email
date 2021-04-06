@@ -39,6 +39,7 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
           }).catch((error) => {
             console.log(error)
           });
+          await setCommentData({...commentData,text_part: undefined, html_part:undefined, commented_at: undefined })
     }
     return (
         <form>
