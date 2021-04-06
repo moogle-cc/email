@@ -1,19 +1,6 @@
 import React from 'react';
 
-const COMMENT_ARRAY = [
-    {
-        name: "Team Moogle",
-        timeStamp: "2 months ago",
-        body: "Hey, Did you know that you can use Markdown to leave comments? These comments can even include links. Just no emojis for now!"
-    },
-    {
-        name: "Team Moogle2",
-        timeStamp: "4 months ago",
-        body: "Hey, Did you know that you can use Markdown to leave comments? These comments can even include links. Just no emojis for now!"
-    }
-];
-
-const CommentList = () => {
+const CommentList = ({COMMENT_ARRAY}) => {
     return (
         <div>
             <ul style={{padding:"1em 0"}}>
