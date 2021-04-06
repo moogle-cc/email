@@ -21,7 +21,7 @@ const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
 const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
-const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comment`;
+const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comments`;
 const DEFAULT_FQDN = HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
@@ -283,10 +283,15 @@ const App = (props) => {
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
           {/* comment */}
-          <div className="comments-container mt-4">
-              <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-              <CommentList />
-          </div>
+          {
+            emailList.currentEmailId ? 
+              <div className="comments-container mt-4">
+                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
+                <CommentList />
+              </div>
+            :null
+          }
+          
         </div>
       </div>
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 
