@@ -30,14 +30,15 @@ let getDomain = (event) => {
 exports.handler = async (event) => {
     console.log(event);
     if(eventIsValid(event)){
-        switch (event.httpMethod.toUpperCase()){
-            case 'POST':
-                let domain = getDomain(event);
-                if(domain){
+        let domain = getDomain(event);
+        if(domain){
+            let bucket = undefined, commentsPrefix = undefined;
+            switch (event.httpMethod.toUpperCase()){
+                case 'POST':
                     let body = JSON.parse(event.body.replace(EMOJI_REGEX, ''));
                     console.log(body);
-                    let bucket = process.env.EMAIL_BUCKET;
-                    let commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
+                    bucket = process.env.EMAIL_BUCKET;
+                    commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
                     return await writeCommentToS3(bucket, domain, commentsPrefix, body)
                     .then(r => {
                         return createResponse(r ? 200 : 400, {msg: (`comment ${r ? 'saved' : 'ignored'}`)});
@@ -46,15 +47,10 @@ exports.handler = async (event) => {
                         console.log(e);
                         return createResponse();
                     });
-                }
-                console.log(`No domain found in event headers`);
-                return createResponse();
-            case 'GET':
-                let domain = getDomain(event);
-                if(domain){
+                case 'GET':
                     let thread_identifier = event.queryStringParameters.email_id;
-                    let bucket = process.env.EMAIL_BUCKET;
-                    let commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
+                    bucket = process.env.EMAIL_BUCKET;
+                    commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
                     return await listS3Files(bucket, domain, commentsPrefix, thread_identifier)
                     .then(async comments => {
                         if(comments){
@@ -71,10 +67,10 @@ exports.handler = async (event) => {
                         console.log(e);
                         return createResponse(400, {msg: 'invalid data'});
                     });
-                }
-                console.log(`No domain found in event headers`);
-                return createResponse();
+            }
         }
+        console.log(`No domain found in event headers`);
+        return createResponse();
     }
     return createResponse(400, {msg: 'invalid data'});
 };
@@ -153,3 +149,4 @@ let eventIsValid = (event) => {
     }
     return false;
 };
+
