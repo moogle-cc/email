@@ -28,15 +28,16 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
         let commented_at = new Date().getTime();
         let idToken = JSON.parse(localStorage.userDetails).id_token;
         const html_part = await document.getElementById("comment-markdown-view").innerHTML;
-        // console.log({...commentData, commented_at, html_part});
         await axios({
             url: `${COMMENT_POST_URL}`,
             headers: {'Authorization': idToken},
             method: "POST",
-            body: {...commentData, commented_at, html_part}
+            data: {...commentData, commented_at, html_part}
           })
           .then(async (response) => {
             console.log(response);
+          }).catch((error) => {
+            console.log(error)
           });
     }
     return (
