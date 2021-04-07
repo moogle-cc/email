@@ -287,7 +287,7 @@ const App = (props) => {
             emailList.currentEmailId ? 
               <div className="comments-container mt-4">
                 <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-                <CommentList />
+                <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
               </div>
             :null
           }

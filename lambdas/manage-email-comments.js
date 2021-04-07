@@ -49,6 +49,31 @@ exports.handler = async (event) => {
                 }
                 console.log(`No domain found in event headers`);
                 return createResponse();
+            case 'GET':
+                let domain = getDomain(event);
+                if(domain){
+                    let thread_identifier = event.queryStringParameters.email_id;
+                    let bucket = process.env.EMAIL_BUCKET;
+                    let commentsPrefix = process.env.EMAIL_COMMENTS_PREFIX;
+                    return await listS3Files(bucket, domain, commentsPrefix, thread_identifier)
+                    .then(async comments => {
+                        if(comments){
+                            return await Promise.all(comments.Contents.map(comment => {
+                                return getS3File(bucket, comment.Key);
+                            }));
+                        }
+                        return [];
+                    })
+                    .then(comments => {
+                            return createResponse(200, {'comments': comments});
+                    })
+                    .catch(e => {
+                        console.log(e);
+                        return createResponse(400, {msg: 'invalid data'});
+                    });
+                }
+                console.log(`No domain found in event headers`);
+                return createResponse();
         }
     }
     return createResponse(400, {msg: 'invalid data'});
@@ -67,6 +92,27 @@ let writeCommentToS3 = async (bucket, domain, commentsPrefix, body) => {
         .then(d => d);
     }
 };
+
+let listS3Files = async (bucket, domain, commentsPrefix, thread_identifier) => {
+    var params = {
+      Bucket: bucket, 
+      Prefix: `${domain}/${commentsPrefix}/${thread_identifier}`
+    };
+    return s3.listObjectsV2(params).promise();
+};
+
+let getS3File = async (bucket, key) => {
+    let getParams = {
+      Bucket: bucket,
+      Key: key
+    };
+    return await s3.getObject(getParams)
+    .promise()
+    .then(async data => {
+      return data.Body.toString('ascii');
+    });
+};
+
 
 const EMAIL_COMMENTS_LOCATION = process.env.EMAIL_COMMENTS_LOCATION;
 const COMMENT_BODY_FIELDS = [
@@ -98,6 +144,9 @@ let eventIsValid = (event) => {
                     return true;
                 }
                 return false;
+            case 'GET':
+                return event.queryStringParameters &&
+                    event.queryStringParameters.email_id;
             default:
                 return false;
         }
