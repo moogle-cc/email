@@ -1,0 +1,122 @@
+*{
+    font-size: 100%;
+}
+h1{
+    font-size: 101%;
+}
+.flex{display: flex;}
+.justify-end{justify-content: flex-end;}
+.justify-between{justify-content: space-between;}
+.justify-center{justify-content: center;}
+.align-center{align-items: center;}
+.left-panel{
+    width: 20vw;
+    height: 100vh;
+    padding: 0 20px;
+    background-color: #DFF1F1;
+    position: fixed;
+}
+.moogle-logo{
+    width: 100%;
+    height: 15vh;
+    margin: 0 auto 60px auto;
+}
+.moogle-logo img{
+    margin: auto 10%;
+    width: 80%;
+}
+.bucketHeader{
+    font-size: 28px;
+    font-weight: 500;
+    padding: 0 20px;
+}
+.editorBtn{
+    outline: none;
+    border: none;
+    padding: 15px 18px;
+    color: #fff;
+    border-radius: 50%;
+    background: #FF8B88;
+    position: absolute;
+    bottom: 10vh;
+    left: 5vh;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+.emailContainer{
+    margin-left: 20vw;
+}
+.emailContainerHeader{
+    width: 100%;
+    height: 8vh;
+    padding: 2vh 40px;
+    box-shadow: 3px 4px 8px rgba(0,0,0,0.2);
+    margin: 0 0 5vh 0;
+}
+.emailSearch{
+    background: rgba(0,0,0,0.07);
+    width: 30%;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 100px;
+    outline: none;
+}
+.emailSearch::placeholder{
+    font-family: 'Poppins' , FontAwesome;
+}
+/* .headerRightElements{ background: #FF8B88;} */
+.headerRightElements .element {
+    margin: auto 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+}
+.headerRightElements .userAvatar{
+    background: #FF8B88;
+    color: #fff;
+    font-size: 18px;
+}
+.headerRightElements .refreshBtn{
+    font-family: 'Poppins' , FontAwesome;
+}
+.headerRightElements .refreshBtn:hover{
+    background: rgba(0,0,0,0.07);
+}
+.emailListContainer{
+    margin: 0 3vw 3vh 3vw;
+}
+.emailListContainer .emailHeader{
+    padding: 10px 0;
+    color: #003862;
+}
+.emailListContainer .emailHeader h1{
+    font-size: 33px;
+    font-weight: bold;
+    margin: 0 0 0 25px;
+}
+.emailListContainer .emailHeader img{
+    width: 70px;
+    height: 70px;
+}
+.emailLists{
+    padding: 20px 30px;
+}
+.email{
+    padding: 5px 0;
+}
+.email img{
+    width: 45px;
+    height: 50px;
+}
+.emailUesrname{
+    padding: 0 30px 0 35px;
+    font-weight: 500;
+    font-size: 18px;
+    color: #003862;
+}
+.emailTextPreview{
+    color: #003862;
+    font-weight: 430;
+}

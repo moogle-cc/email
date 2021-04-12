@@ -74,7 +74,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
     };
 
     const setEmailDestinations=() =>{
-      if(emailList.currentEmail){
+      if(emailList.currentEmail && emailList.currentEmail.emailContent){
         let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
         let tempToEmail = makeTo();
         let tempCcEmail = makeCc();

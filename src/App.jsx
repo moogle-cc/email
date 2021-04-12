@@ -12,7 +12,7 @@ import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import CommentForm from './components/commentForm';
 import CommentList from './components/commentList';
-import './App.css';
+// import './App.css';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -22,7 +22,7 @@ const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
 const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comments`;
-const DEFAULT_FQDN = HOST;
+const DEFAULT_FQDN = HOST.startsWith('localhost') ? 'moogle.cc' : HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
@@ -117,8 +117,9 @@ const App = (props) => {
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
+      console.log(`${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`);
       return await axios({
-        url: `${EMAIL_CONTENT_URL}?id=${x}`,
+        url: `${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`,
         headers: {'Authorization': authDetails.id_token}
       })
       .then( (response) => {
@@ -135,7 +136,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
-        url: `${EMAILS_LIST_URL}?folderpath=/email`,
+        url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
