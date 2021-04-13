@@ -2,20 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App.jsx';
-import NewDesign from './NewDesign';
 import reportWebVitals from './reportWebVitals';
-import {BrowserRouter, Switch , Route} from 'react-router-dom';
-import './New.css'
 
 ReactDOM.render(
   <React.StrictMode>
-  <BrowserRouter>
-    <Switch>
-      <Route path="/new-design" exact component={NewDesign} />
-      <Route path="/email" exact component={App} />
-    </Switch>
-  </BrowserRouter>
-      {/* <App /> */}
+      <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
