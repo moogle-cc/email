@@ -12,7 +12,7 @@ import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import CommentForm from './components/commentForm';
 import CommentList from './components/commentList';
-// import './App.css';
+import './App.css';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -263,15 +263,45 @@ const App = (props) => {
   // };
  
   return (
-    <div className="App">
-      <form id="email-contents">
-      {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
-      <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
-        setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} />
-      <div className="columns">
-        <div className="column is-one-quarter">
-          <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
+    <div className="mainEmailContainer">
+      <div className="left-panel">
+          <div className="moogle-logo">
+              <img src="https://moogle.cc/media/moogle-logo.png" alt="moogle" />
+          </div>
+          <div className="bucketContainer">
+              <h1 className="bucketHeader">BUCKETS</h1>
+          </div>
+          <button className="editorBtn">
+              <i className="fa fa-pencil"></i>
+          </button>
+      </div>
+
+      <div class="emailContainer">
+        <div class="emailContainerHeader flex justify-between">
+            <input type="text" class="emailSearch" placeholder="&#xF002;  Search" />
+            <div class="headerRightElements flex">
+                <div class="refreshBtn element flex justify-center align-center"> <span>&#xf021;</span> </div>
+                <div class="userAvatar element flex justify-center align-center"> <span> A </span> </div>
+            </div>
         </div>
+        <div class="emailListContainer">
+            <div class="emailHeader flex">
+                <img src="https://moogle.cc/media/moogle-comment-share.png" />
+                <h1 class="flex justify-center align-center"> <span> Jobs </span></h1>
+            </div>
+            <ul class="emailLists">
+              <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
+            </ul>
+        </div>
+      </div>
+      {/* <form id="email-contents"> */}
+      {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
+      {/* <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
+        setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} /> */}
+      <div className="columns">
+        {/* <div className="column is-one-quarter">
+          <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
+        </div> */}
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
@@ -301,7 +331,7 @@ const App = (props) => {
 
       <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} HOST={HOST} emailList={emailList}
         deviceIsMobile={deviceIsMobile} ADDRESS_DELIM={ADDRESS_DELIM} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
-    </form>
+    {/* </form> */}
     </div>
   )
 }

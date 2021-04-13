@@ -104,19 +104,25 @@ h1{
     padding: 20px 30px;
 }
 .email{
-    padding: 5px 0;
+    padding: 3px 0;
 }
 .email img{
     width: 45px;
     height: 50px;
 }
 .emailUesrname{
+    width: 225px;
     padding: 0 30px 0 35px;
     font-weight: 500;
     font-size: 18px;
     color: #003862;
+    margin: 0 10px 0 10px !important;
+    overflow: hidden;
 }
 .emailTextPreview{
     color: #003862;
     font-weight: 430;
+}
+.selectedEmail{
+    box-shadow: 0 0 5px rgba(0,0,0,0.4);
 }
