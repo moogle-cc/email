@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import axios from 'axios';
-import moment from 'moment';
+// import moment from 'moment';
 import AWS from 'aws-sdk';
 import Navbar from './components/navbar';
 import EmailList from './components/emailList';
@@ -13,6 +13,7 @@ import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no
 import CommentForm from './components/commentForm';
 import CommentList from './components/commentList';
 import './App.css';
+import SideBar from './components/sidebar';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -117,7 +118,6 @@ const App = (props) => {
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
-      console.log(`${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`);
       return await axios({
         url: `${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`,
         headers: {'Authorization': authDetails.id_token}
@@ -196,13 +196,13 @@ const App = (props) => {
     setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
   };
   
-  const friendlyDate=(d)=>{
-    return moment(d).fromNow();
-  };
+  // const friendlyDate=(d)=>{
+  //   return moment(d).fromNow();
+  // };
 
-  const awsCredentialsAreAvailable=()=>{
-    return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
-  }
+  // const awsCredentialsAreAvailable=()=>{
+  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
+  // }
   
   const getSESObject=(refresh) =>{
     if(keys.accessKeyId && keys.secretAccessKey && keys.region !== ""){
@@ -264,56 +264,25 @@ const App = (props) => {
  
   return (
     <div className="mainEmailContainer">
-      <div className="left-panel">
-          <div className="moogle-logo">
-              <img src="https://moogle.cc/media/moogle-logo.png" alt="moogle" />
-          </div>
-          <div className="bucketContainer">
-              <h1 className="bucketHeader">BUCKETS</h1>
-          </div>
-          <button className="editorBtn">
-              <i className="fa fa-pencil"></i>
-          </button>
-      </div>
-
-      <div class="emailContainer">
-        <div class="emailContainerHeader flex justify-between">
-            <input type="text" class="emailSearch" placeholder="&#xF002;  Search" />
-            <div class="headerRightElements flex">
-                <div class="refreshBtn element flex justify-center align-center"> <span>&#xf021;</span> </div>
-                <div class="userAvatar element flex justify-center align-center"> <span> A </span> </div>
-            </div>
-        </div>
-        <div class="emailListContainer">
-            <div class="emailHeader flex">
-                <img src="https://moogle.cc/media/moogle-comment-share.png" />
-                <h1 class="flex justify-center align-center"> <span> Jobs </span></h1>
-            </div>
-            <ul class="emailLists">
-              <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
-            </ul>
-        </div>
-      </div>
-      {/* <form id="email-contents"> */}
       {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
-      {/* <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
-        setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} /> */}
+      <SideBar />
+      <div class="emailContainer">
+        <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
+        <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+      </div>
       <div className="columns">
-        {/* <div className="column is-one-quarter">
-          <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
-        </div> */}
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
-        <div className="column  primary-background mx-2">
-          {/* <!-- email actions--> */}
+        {/* <div className="column  primary-background mx-2">
+          {/* <!-- email actions--> 
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
-          {/* comment */}
+          {/* comment *
           {
             emailList.currentEmailId ? 
               <div className="comments-container mt-4">
@@ -323,7 +292,7 @@ const App = (props) => {
             :null
           }
           
-        </div>
+        </div> */}
       </div>
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 
         deviceIsMobile={deviceIsMobile} keys={keys} setKeys={setKeys} sesRegions={sesRegions} 
@@ -331,7 +300,6 @@ const App = (props) => {
 
       <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} HOST={HOST} emailList={emailList}
         deviceIsMobile={deviceIsMobile} ADDRESS_DELIM={ADDRESS_DELIM} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
-    {/* </form> */}
     </div>
   )
 }
