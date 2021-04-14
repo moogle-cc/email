@@ -1,6 +1,6 @@
 import React from 'react'; 
 
-const Navbar = ({getEmails, setEmailComposeModalIsVisible, authTokenIsValid, setAwsModalIsVisible, awsCredentialsAreAvailable}) => {
+const Navbar = ({getEmails, authTokenIsValid}) => {
 
     return  (
       <div>

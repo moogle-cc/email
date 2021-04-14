@@ -14,6 +14,7 @@ import CommentForm from './components/commentForm';
 import CommentList from './components/commentList';
 import './App.css';
 import SideBar from './components/sidebar';
+import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react-dom';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -149,7 +150,7 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        await setEmailList({...emailList, emailSet: tempEmailSet,currentEmail: tempEmailSet[0],currentEmailId: tempEmailSet[0].Key,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        await setEmailList({...emailList, emailSet: tempEmailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
     } else {
@@ -268,14 +269,19 @@ const App = (props) => {
       <SideBar />
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
-        <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+        <div style={{display: "flex"}}>
+          <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+          {
+            emailList.currentEmail ? <EmailContent emailList={emailList} /> : null
+          }
+        </div>
       </div>
-      <div className="columns">
+      {/* <div className="columns">
         <div className="column is-half">
           <EmailContent emailList={emailList} />
         </div>
-        {/* <div className="column  primary-background mx-2">
-          {/* <!-- email actions--> 
+        <div className="column  primary-background mx-2">
+          {/* <!-- email actions--> *
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
@@ -292,8 +298,8 @@ const App = (props) => {
             :null
           }
           
-        </div> */}
-      </div>
+        </div>
+      </div> */}
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 
         deviceIsMobile={deviceIsMobile} keys={keys} setKeys={setKeys} sesRegions={sesRegions} 
         setDataMustBeSavedLocally={setDataMustBeSavedLocally} />

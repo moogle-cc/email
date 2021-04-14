@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import "./emailContent.css";
 
 const EmailContent = ({emailList}) => {
     useEffect(() => {}, [emailList.currentEmail]);
@@ -18,8 +19,11 @@ const EmailContent = ({emailList}) => {
         return undefined;
     };
     return(
-        <div className="" id="email-content">
-            <h5 style={{fontFamily: "Poppins", fontWeight: "600"}}>Email Preview</h5>
+        <div style={{width: "50%"}} id="email-content" className="emailContent">
+            <div class="emailHeader flex">
+                <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
+                <h1 class="flex justify-center align-center"> <span> Jobs </span></h1>
+            </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
                 :
@@ -38,7 +42,7 @@ const EmailContent = ({emailList}) => {
                     : null
                     }
                 </ul>
-                <iframe  title="1" frameBorder="0" style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"100vh",width:"100%"}} height="100vh" width="100vw" src={iframeSrc()}></iframe>
+                <iframe  title="1" frameBorder="0"style={{overflow:'hidden',"overflowX":'hidden',"overflowY":'hidden',height:"95vh",width:"100%"}} src={iframeSrc()}></iframe>
                 </div>
             }   
         </div>
