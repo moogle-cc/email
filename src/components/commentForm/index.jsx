@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import MarkdownView from 'react-showdown';
 import axios from 'axios';
+import "./commentForm.css"
 
 const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
     const [commentData, setCommentData] = useState({
@@ -42,24 +43,14 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
           await setCommentData({...commentData,text_part: undefined, html_part:undefined, commented_at: undefined })
     }
     return (
-        <form>
+        <form className="commentForm">
             <div className="field">
-                <label className="label">Name</label>
+                <label className="label">Your Comment  <i clasNmae="infoButton" onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}} class="fa fa-info-circle" aria-hidden="true"></i></label>
                 <div className="control">
-                    <input className="input" type="text" name="commenter_name" value={commentData.commenter_name} readOnly/>
+                    <textarea className="textArea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
                 </div>
             </div>
-            <div className="field">
-                <label className="label">Your Comment</label>
-                <div className="control">
-                    <textarea className="textarea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
-                </div>
-            </div>
-            <div >
-                <button className="button is-full secondary-icon-style" style={{width: "90%"}} onClick={handleSubmit}>Submit</button>  
-                <i onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}}className="fas fa-info-circle" style={{fontSize: "1.2em"}}></i>
-            </div>
-            
+            <button className="submitBtn"  onClick={handleSubmit}><i class="fa fa-paper-plane" aria-hidden="true"></i></button>  
             <MarkdownView id="comment-markdown-view" markdown={commentData.text_part || "You can see your comment preview here"}/>     
             <div className={isModalVisible ? "modal is-active" : "modal"}>
                 <div className="modal-background"></div>

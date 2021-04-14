@@ -28,7 +28,7 @@ h1{
 .left-panel{
     width: 20vw;
     height: 100vh;
-    padding: 0 20px;
+
     background-color: #DFF1F1;
     position: fixed;
 }
@@ -41,11 +41,7 @@ h1{
     margin: auto 10%;
     width: 80%;
 }
-.bucketHeader{
-    font-size: 28px;
-    font-weight: 500;
-    padding: 0 20px;
-}
+
 .editorBtn{
     outline: none;
     border: none;

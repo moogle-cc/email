@@ -149,7 +149,9 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        await setEmailList({...emailList, emailSet: tempEmailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        let buckets = makeBuckets(tempEmailSet);
+        localStorage.setItem("buckets", JSON.stringify(buckets));
+        await setEmailList({...emailList, emailSet: buckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
     } else {
@@ -243,6 +245,23 @@ const App = (props) => {
   const redirectToLogin=() =>{
     window.location.href = loginUrl;
   };
+  const makeBuckets = (emailSet) => {
+    let buckets = [{name: "spam", emailSet: []}];
+    emailSet.forEach((email) => {
+      let newBucket = email.emailContent.from.value[0].address.split("@")[0].toLowerCase();
+      let found = buckets.some(buck => buck.name === newBucket);
+      if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
+        buckets[0].emailSet.push(email);
+      }
+      else if(found){
+          let index = buckets.findIndex(buck => buck.name === newBucket);
+          buckets[index].emailSet.push(email)
+      }else{
+          buckets.push({name: newBucket, emailSet: [email]});
+      }
+    });
+    return buckets;
+  }
 
   // const replyAll=async () =>{
   //   setEmailList({...emailList, statusMsg: 'Composing Reply...'})
@@ -265,13 +284,15 @@ const App = (props) => {
   return (
     <div className="mainEmailContainer">
       {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
-      <SideBar />
+      <SideBar setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
           <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
           {
-            emailList.currentEmail ? <EmailContent emailList={emailList} /> : null
+            emailList.currentEmail ? 
+                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
+            : null
           }
         </div>
       </div>
