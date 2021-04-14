@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
+import "./commentList.css";
 
 const CommentList = ({currentEmailId, COMMENT_POST_URL}) => {
     let [commentArray, setCommentArray] = useState([]);
@@ -25,8 +26,9 @@ const CommentList = ({currentEmailId, COMMENT_POST_URL}) => {
     }
     // let comment_html = document.getElementById("comments_html");
     return (
-        <div>
-            <ul style={{padding:"1em 0"}}>
+        <div className="commentList">
+            <h3 className="emailUesrname">Your Comments</h3>
+            <ul>
             {
                 commentArray ?
                 commentArray.map((comment, index) => (

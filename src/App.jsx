@@ -10,8 +10,6 @@ import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
-import CommentForm from './components/commentForm';
-import CommentList from './components/commentList';
 import './App.css';
 import SideBar from './components/sidebar';
 
@@ -47,7 +45,7 @@ const App = (props) => {
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
-  const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
+  // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
     emailContent: undefined,
@@ -185,18 +183,18 @@ const App = (props) => {
     }
     return false;
   };
-  const shareableUrl = () => {
-    return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
-  };
+  // const shareableUrl = () => {
+  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
+  // };
  
-  const copyToClipboard = () => {
-    var copyText = document.getElementById("shareable-link");
-    copyText.type = 'text';
-    copyText.select();
-    document.execCommand("copy");
-    copyText.type = 'hidden';
-    setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
-  };
+  // const copyToClipboard = () => {
+  //   var copyText = document.getElementById("shareable-link");
+  //   copyText.type = 'text';
+  //   copyText.select();
+  //   document.execCommand("copy");
+  //   copyText.type = 'hidden';
+  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
+  // };
   
   // const friendlyDate=(d)=>{
   //   return moment(d).fromNow();

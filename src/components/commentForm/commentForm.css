@@ -13,12 +13,13 @@
 }
 .commentForm{
     padding: 0 0 0 30px;
+    display: inline-block;
 }
 input:focus, textarea:focus, select:focus{
     outline: none;
 }
 .textArea{
-    width: 35vh;
+    width: 30vh;
     height:15vh;
     border: none;
     margin: 15px;
@@ -28,6 +29,5 @@ input:focus, textarea:focus, select:focus{
     box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.4)
 }
 .field{
-   
     display: inline-block;
 }

@@ -48,8 +48,11 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
                     
                 </div>
             } 
-            <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-            <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
+            <div >
+                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
+                <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
+            </div>
+            
         </div>
     )
 }

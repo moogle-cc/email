@@ -40,12 +40,12 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
           }).catch((error) => {
             console.log(error)
           });
-          await setCommentData({...commentData,text_part: undefined, html_part:undefined, commented_at: undefined })
+          await setCommentData({...commentData,text_part: "", html_part:"", commented_at: undefined })
     }
     return (
         <form className="commentForm">
             <div className="field">
-                <label className="label">Your Comment  <i clasNmae="infoButton" onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}} class="fa fa-info-circle" aria-hidden="true"></i></label>
+                <label className="label">Comment Here  <i clasNmae="infoButton" onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}} class="fa fa-info-circle" aria-hidden="true"></i></label>
                 <div className="control">
                     <textarea className="textArea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
                 </div>

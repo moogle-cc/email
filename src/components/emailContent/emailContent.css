@@ -4,6 +4,9 @@
     margin: 0 0 0 1vh;
     padding: 0 0 3vh 0;
 }
+.dontDisplay{
+  display: none;
+}
 .emailContent .emailHeader img{
     width: 70px;
     height: 70px;
@@ -18,7 +21,7 @@
     margin: 0 0 0 25px;
 }
 .emailContent iframe{
-  max-height: 50vh;
+  max-height: 70vh;
 }
 
 @keyframes fadeIn {
