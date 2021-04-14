@@ -148,8 +148,8 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
+        let buckets = makeBuckets(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempEmailSet,currentEmail: tempEmailSet[0],currentEmailId: tempEmailSet[0].Key,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
-        
       });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
@@ -242,6 +242,21 @@ const App = (props) => {
   const redirectToLogin=() =>{
     window.location.href = loginUrl;
   };
+
+  const makeBuckets = (emailSet) => {
+    let buckets = [];
+    emailSet.forEach((email) => {
+      let newBucket = email.emailContent.from.value[0].address.split("@")[0].toLowerCase();
+      let found = buckets.some(buck => buck.name === newBucket);
+      if(found){
+          let index = buckets.findIndex(buck => buck.name === newBucket);
+          buckets[index].emailSet.push(email)
+      }else{
+          buckets.push({name: newBucket, emailSet: [email]});
+      }
+    });
+    return buckets;
+  }
 
   // const replyAll=async () =>{
   //   setEmailList({...emailList, statusMsg: 'Composing Reply...'})
