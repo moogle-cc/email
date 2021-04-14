@@ -14,7 +14,6 @@ import CommentForm from './components/commentForm';
 import CommentList from './components/commentList';
 import './App.css';
 import SideBar from './components/sidebar';
-import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react-dom';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
