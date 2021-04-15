@@ -13,9 +13,9 @@ const SideBar = ({setEmailList}) => {
         })
     }
     const selectBucket = (idx) => {
-        const noOfEmails = document.querySelectorAll('[id]');
-        noOfEmails.forEach((data) => {
-          if(data.classList.contains('selectedBucket')) data.classList.remove('selectedBucket')
+        const noOfBuckets = document.querySelectorAll('[id]');
+        noOfBuckets.forEach((data) => {
+          if(data.classList.contains('selectedBucket')) data.classList.remove('selectedBucket');
           document.querySelector('[id="'+idx+'"]').classList.add('selectedBucket');
         });
         // document.querySelector('[id="'+idx+'"]').classList.add('selectedBucket');

@@ -21,7 +21,23 @@
     margin: 0 0 0 25px;
 }
 .emailContent iframe{
-  max-height: 70vh;
+  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y: hidden;
+  width:100%;
+}
+.smallFrame{
+  height: 51vh;
+}
+.largeFrame{
+  height: 77vh;
+}
+.commentIcon{
+  position: absolute;
+  right: 20px;
+}
+.isInvisible{
+  display: none;
 }
 
 @keyframes fadeIn {

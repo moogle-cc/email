@@ -32,12 +32,11 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
     }
     
     const selectEmail = (idx) => {
-      const noOfEmails = document.querySelectorAll('[id]');
+      const noOfEmails = document.querySelectorAll('[idx]');
       noOfEmails.forEach((data) => {
         if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
         document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
       });
-      // document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
       return true;
     }
 
@@ -51,7 +50,7 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
                 {
                   emailList.emailSet ?
                   emailList.emailSet.map((email, idx)=> (
-                    <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={(e) =>{e.preventDefault(); selectEmail(idx); showEmail(email.Key)}}>
+                    <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
                       {
                         email.emailContent ? 
                           <div className="email flex">
