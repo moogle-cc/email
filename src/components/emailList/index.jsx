@@ -32,12 +32,14 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
     }
     
     const selectEmail = (idx) => {
-      const noOfEmails = document.querySelectorAll('[idx]');
-      noOfEmails.forEach((data) => {
-        if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
-        document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
-      });
-      return true;
+      if(localStorage.buckets){
+        const noOfEmails = document.querySelectorAll('[idx]');
+        noOfEmails.forEach((data) => {
+          if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
+          document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
+        });
+        return true;
+      }
     }
     let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
     let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
