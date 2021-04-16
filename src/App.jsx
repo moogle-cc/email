@@ -161,11 +161,12 @@ const App = (props) => {
     let hash = (new URL(document.location)).hash;
     let loc = hash ? document.location.href.replace(/#/, '?') : document.location;
     let params = (new URL(loc)).searchParams;
+    
     if(params.get('id_token') && params.get('access_token') && params.get('expires_in') && tokenIsValid(params.get('id_token'))){
       let temp = {
         id_token: params.get('id_token'),
         access_token: params.get('access_token'),
-      };
+      }
       localStorage.setItem("userDetails" ,JSON.stringify(temp));
       setAuthDetails(temp)
     }else{ 

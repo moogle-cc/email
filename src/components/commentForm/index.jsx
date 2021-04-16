@@ -3,7 +3,7 @@ import MarkdownView from 'react-showdown';
 import axios from 'axios';
 import "./commentForm.css"
 
-const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
+const CommentForm = ({currentEmailId, COMMENT_POST_URL, getComments}) => {
     const [commentData, setCommentData] = useState({
         'thread_identifier': "",
         'update_type': "NEW",
@@ -39,7 +39,8 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
             console.log(response);
           }).catch((error) => {
             console.log(error)
-          });
+          })
+          await getComments(currentEmailId);
           await setCommentData({...commentData,text_part: "", html_part:"", commented_at: undefined })
     }
     return (

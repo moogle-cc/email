@@ -1,11 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import CommentForm from '../commentForm';
 import CommentList from "../commentList"
+import axios from 'axios';
 import "./emailContent.css";
 
 const EmailContent = ({emailList, COMMENT_POST_URL}) => {
-    useEffect(() => {}, [emailList.currentEmail]);
+    const [commentArray, setCommentArray] = useState([]);
+    useEffect(() => {
+        if(emailList.currentEmailId)
+            getComments(emailList.currentEmailId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [emailList.currentEmail]);
 
+    const getComments = async (currentEmailId) => {
+        let idToken = JSON.parse(localStorage.userDetails).id_token;
+        await axios({
+            url: `${COMMENT_POST_URL}?email_id=${currentEmailId}`,
+            headers: {'Authorization': idToken},
+          })
+          .then(async values => {
+            let comments = values.data.comments;
+            comments = comments.map((comment) => JSON.parse(comment))
+            comments.sort((a, b) => (a.commented_at < b.commented_at) ? 1 : -1)
+            if(comments !== commentArray)
+                await setCommentArray(comments);  
+          })
+    }
     const iframeSrc = ()=>{
         if(emailList.emailContent){
             const blob = new Blob([emailList.emailContent], { type: 'text/html' });
@@ -41,7 +61,10 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
                 <h3 class="flex justify-center align-center" style={{maxWidth: "86%"}}> <span> {emailList.currentEmail.emailContent.subject}</span></h3>
-                <div className="commentIcon" onClick={handlShowComments}><i class="fa fa-comments fa-3x" aria-hidden="true"></i></div>
+                <div className="commentIcon" onClick={handlShowComments}>
+                    <i class="fa fa-comments fa-3x" aria-hidden="true"></i>
+                    <span>{commentArray.length}</span>
+                </div>
             </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
@@ -66,8 +89,8 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
                 </div>
             } 
             <div className="isInvisible" id="comment-section">
-                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-                <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
+                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL} getComments={getComments}/>
+                <CommentList commentArray={commentArray} />
             </div>
             
         </div>

@@ -5,7 +5,7 @@ const SideBar = ({setEmailList}) => {
     useEffect(() => {
         if(localStorage.buckets)
             document.getElementById(0).classList.add('selectedBucket')
-    },[])
+    })
     const  showBucketEmail = (index) => {
         let buckets = JSON.parse(localStorage.buckets);
         setEmailList({

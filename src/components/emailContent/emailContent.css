@@ -41,6 +41,13 @@
   color: #003862;
   cursor: pointer;
 }
+.commentIcon span{
+  position: relative;
+  right: 57%;
+  color: white;
+  bottom: 0.9em;
+}
+
 .isInvisible{
   display: none;
 }
@@ -48,6 +55,9 @@
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #003862;
   color: transparent;
+}
+.showingComments span{
+  color: black;
 }
 
 @keyframes fadeIn {
