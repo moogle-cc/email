@@ -32,7 +32,7 @@ const CommentList = ({currentEmailId, COMMENT_POST_URL}) => {
             {
                 commentArray ?
                 commentArray.map((comment, index) => (
-                    <li style={{backgroundColor: index%2===0 ? "#f5f5f5" : "", margin: "1rem 0", padding:"0.5rem"}}>
+                    <li style={{backgroundColor: index%2!==0 ? "white" : "", padding:" 1em 0.5rem"}}>
                         <div><strong>{comment.commenter_name} @ {moment(comment.commented_at).calendar()}</strong></div>
                         <div dangerouslySetInnerHTML={{ __html: comment.html_part }} />
                     </li>

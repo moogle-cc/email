@@ -246,7 +246,8 @@ const App = (props) => {
   const makeBuckets = (emailSet) => {
     let buckets = [{name: "spam", emailSet: []}];
     emailSet.forEach((email) => {
-      let newBucket = email.emailContent.from.value[0].address.split("@")[0].toLowerCase();
+      let name = email.emailContent.headers.to.value[0].name.length>0 ? email.emailContent.headers.to.value[0].name : email.emailContent.headers.to.value[0].address.split("@")[0];
+      let newBucket = name.toLowerCase();
       let found = buckets.some(buck => buck.name === newBucket);
       if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
         buckets[0].emailSet.push(email);
@@ -295,9 +296,6 @@ const App = (props) => {
         </div>
       </div>
       {/* <div className="columns">
-        <div className="column is-half">
-          <EmailContent emailList={emailList} />
-        </div>
         <div className="column  primary-background mx-2">
           {/* <!-- email actions--> *
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
@@ -306,15 +304,6 @@ const App = (props) => {
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
-          {/* comment *
-          {
-            emailList.currentEmailId ? 
-              <div className="comments-container mt-4">
-                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-                <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-              </div>
-            :null
-          }
           
         </div>
       </div> */}

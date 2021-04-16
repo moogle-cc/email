@@ -1,10 +1,9 @@
 .commentList{
-    display: inline-block;
-    width: 30vh;
-    padding: 3vh 0 0 30px;
+    padding: 2em 0 0 2em;
+    
 }
 .commentList ul{
     overflow-y: scroll;
-    max-height: 25vh;
-    padding:1em 0;
+    max-height: 20em;
+    background: rgba(0,0,0,0.07);
 }

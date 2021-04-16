@@ -27,24 +27,26 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
             data.classList.remove('isInvisible');
             iframedata.classList.remove("largeFrame");
             iframedata.classList.add("smallFrame");
+            document.getElementsByClassName("commentIcon")[0].classList.add("showingComments")
         }
         else {
             data.classList.add('isInvisible');
             iframedata.classList.remove("smallFrame");
             iframedata.classList.add("largeFrame");
+            document.getElementsByClassName("commentIcon")[0].classList.remove("showingComments")
         }
     }
     return(
         <div id="email-content" style={{width: "50%"}}className="emailContent">
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h1 class="flex justify-center align-center"> <span> Jobs </span></h1>
+                <h3 class="flex justify-center align-center" style={{maxWidth: "86%"}}> <span> {emailList.currentEmail.emailContent.subject}</span></h3>
                 <div className="commentIcon" onClick={handlShowComments}><i class="fa fa-comments fa-3x" aria-hidden="true"></i></div>
             </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
                 :
-                <div >
+                <div className="iframeContainer">
                     {
                         attachments() && attachments().length > 0 ? <h6 style={{fontFamily: "Poppins", fontWeight: "600"}}>Attachments</h6>: null
                     }

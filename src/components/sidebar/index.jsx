@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import "./sidebar.css"
 
 const SideBar = ({setEmailList}) => {
+    useEffect(() => {
+        document.getElementById(0).classList.add('selectedBucket')
+    },[])
     const  showBucketEmail = (index) => {
         let buckets = JSON.parse(localStorage.buckets);
         setEmailList({

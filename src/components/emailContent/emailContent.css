@@ -5,14 +5,14 @@
     padding: 0 0 3vh 0;
 }
 .dontDisplay{
-  display: none;
+  display: none !important;
 }
+
 .emailContent .emailHeader img{
     width: 70px;
     height: 70px;
 }
 .emailContent  .emailHeader{
-    padding: 10px 0;
     color: #003862;
 }
 .emailContent  .emailHeader h1{
@@ -27,17 +27,27 @@
   width:100%;
 }
 .smallFrame{
-  height: 51vh;
+  height: 34em;
 }
 .largeFrame{
-  height: 77vh;
+  height: 53em;
+}
+.iframeContainer{
+  height: auto;
 }
 .commentIcon{
   position: absolute;
   right: 20px;
+  color: #003862;
+  cursor: pointer;
 }
 .isInvisible{
   display: none;
+}
+.showingComments i{
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #003862;
+  color: transparent;
 }
 
 @keyframes fadeIn {

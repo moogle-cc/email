@@ -39,12 +39,13 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
       });
       return true;
     }
-
+    let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
+    let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
     return (
       <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h1 class="flex justify-center align-center"> <span> Jobs </span></h1>
+                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {JSON.parse(localStorage.buckets)[selectedBucketId].name} </span></h1>
             </div>
             <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
                 {

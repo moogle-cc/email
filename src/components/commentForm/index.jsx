@@ -47,7 +47,7 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
             <div className="field">
                 <label className="label">Comment Here  <i clasNmae="infoButton" onClick={(e) => {e.preventDefault(); setIsModalVisible(true)}} class="fa fa-info-circle" aria-hidden="true"></i></label>
                 <div className="control">
-                    <textarea className="textArea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
+                    <textarea  maxLength="250" className="textArea" name="text_part" value={commentData.text_part} onChange={handleChange} placeholder="Example: This email needs to be re-sent to HR"></textarea>
                 </div>
             </div>
             <button className="submitBtn"  onClick={handleSubmit}><i class="fa fa-paper-plane" aria-hidden="true"></i></button>  
@@ -65,6 +65,7 @@ const CommentForm = ({currentEmailId, COMMENT_POST_URL}) => {
                             <li>&#8226; *Italics*: <em>Italics</em></li>
                             <li>&#8226; [Link Text](https://moogle.cc): <a href="https://moogle.cc">Link Text</a></li>
                             <li>&#8226; We don't yet support emojis</li>
+                            <li>&#8226; We except only the first 250 characters</li>
                         </ul>
                     </section>
                 </div>

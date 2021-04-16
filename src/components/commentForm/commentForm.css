@@ -6,21 +6,20 @@
     border-radius: 50%;
     background: #FF8B88;
     position: relative;
-    bottom: 3vh;
-    right: 8vh;
+    bottom: 4em;
+    left: 36em;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
     cursor: pointer;
 }
 .commentForm{
-    padding: 0 0 0 30px;
-    display: inline-block;
+    padding: 0 5% 0 5%;
 }
 input:focus, textarea:focus, select:focus{
     outline: none;
 }
 .textArea{
-    width: 30vh;
-    height:15vh;
+    width: 95%;
+    min-height: 7em;
     border: none;
     margin: 15px;
 }
@@ -28,6 +27,6 @@ input:focus, textarea:focus, select:focus{
     border-radius: 20px;
     box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.4)
 }
-.field{
-    display: inline-block;
-}
+/* .field{
+    margin-right: 10px;
+} */
