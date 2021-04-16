@@ -45,7 +45,7 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
       <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {JSON.parse(localStorage.buckets)[selectedBucketId].name} </span></h1>
+                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {localStorage.buckets ? JSON.parse(localStorage.buckets)[selectedBucketId].name : "Spam"} </span></h1>
             </div>
             <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
                 {
