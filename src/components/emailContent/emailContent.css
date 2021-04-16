@@ -57,7 +57,7 @@
   color: transparent;
 }
 .showingComments span{
-  color: black;
+  color: #003862;
 }
 
 @keyframes fadeIn {

@@ -260,6 +260,7 @@ const App = (props) => {
           buckets.push({name: newBucket, emailSet: [email]});
       }
     });
+    buckets.push(buckets.shift());
     return buckets;
   }
 
