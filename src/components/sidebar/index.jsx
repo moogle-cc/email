@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import "./sidebar.css"
 
-const SideBar = ({setEmailList}) => {
+const SideBar = ({buckets, setEmailList}) => {
+    
     useEffect(() => {
-        if(localStorage.buckets)
+        if(buckets)
             document.getElementById(0).classList.add('selectedBucket')
-    })
+    }, [buckets])
     const  showBucketEmail = (index) => {
         let buckets = JSON.parse(localStorage.buckets);
         setEmailList({
@@ -35,8 +36,8 @@ const SideBar = ({setEmailList}) => {
             </div>
             <ul className="bucketList" style={{overflowY: "scroll", maxHeight: "65vh"}}>
                 {
-                    localStorage.buckets ? 
-                    JSON.parse(localStorage.buckets).map((bucket,idx) => (
+                    buckets ? 
+                    buckets.map((bucket,idx) => (
                         <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={(e) =>{e.preventDefault(); selectBucket(idx); showBucketEmail(idx)}}>
                         {
                             <div className="bucket flex">

@@ -45,6 +45,7 @@ const App = (props) => {
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
+  let [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
   // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
@@ -147,9 +148,10 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        let buckets = makeBuckets(tempEmailSet);
-        localStorage.setItem("buckets", JSON.stringify(buckets));
-        await setEmailList({...emailList, emailSet: buckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        let tempBuckets = makeBuckets(tempEmailSet);
+        localStorage.setItem("buckets", JSON.stringify(tempBuckets));
+        setBuckets(tempBuckets);
+        await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
     } else {
@@ -285,7 +287,7 @@ const App = (props) => {
   return (
     <div className="mainEmailContainer">
       {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
-      <SideBar setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
