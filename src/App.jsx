@@ -246,7 +246,9 @@ const App = (props) => {
           buckets.push({name: newBucket, emailSet: [email]});
       }
     });
-    buckets.push(buckets.shift());
+    let spam = buckets.shift();
+    buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
+    buckets.push(spam)
     return buckets;
   }
 
