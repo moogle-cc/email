@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Stackedit from 'stackedit-js';
-
-const EMAIL_ADDRESS_DELIM = "@";
+import { EMAIL_ADDRESS_DELIM } from '../../constants';
 
 const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ADDRESS_DELIM, ses, HOST, emailComposeModalIsVisible}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
