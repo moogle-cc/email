@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 
-const EmailList = ({emailList, fqdn, setEmailList}) => {
+const EmailList = ({emailList, allEmails, fqdn, setEmailList}) => {
     useEffect(() => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
@@ -43,16 +43,17 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
     }
     let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
     let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
+    let emailSet = selectedBucketId === '0' ? allEmails : emailList.emailSet;
     return (
       <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {localStorage.buckets ? JSON.parse(localStorage.buckets)[selectedBucketId].name : "Spam"} </span></h1>
+                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {localStorage.buckets ? JSON.parse(localStorage.buckets)[selectedBucketId].name : "All"} </span></h1>
             </div>
             <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
                 {
-                  emailList.emailSet ?
-                  emailList.emailSet.map((email, idx)=> (
+                  emailSet ?
+                  emailSet.map((email, idx)=> (
                     <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
                       {
                         email.emailContent ? 

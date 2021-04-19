@@ -5,7 +5,7 @@ const SideBar = ({buckets, setEmailList}) => {
     
     useEffect(() => {
         if(buckets)
-            document.getElementById(0).classList.add('selectedBucket')
+            selectBucket(0)
     }, [buckets])
     const  showBucketEmail = (index) => {
         let buckets = JSON.parse(localStorage.buckets);
@@ -43,9 +43,11 @@ const SideBar = ({buckets, setEmailList}) => {
                         {
                             <div className="bucket flex">
                                 <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
-                                <h3 className="bucketName">{ bucket.name }</h3>
+                                <h3 className="bucketName">{ bucket.name } </h3>
+                                <span className="bucketEmailCount">{idx === 0 ? 100 :bucket.emailSet.length}</span>
                             </div>
                         }
+                        {idx === 0 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0.5em 0"}}/> : null}
                         </li>
                     ))
                     :null

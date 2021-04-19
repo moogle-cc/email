@@ -3,13 +3,30 @@
     background-color:white;
     width:100%;
     border-radius: 0;
+    display: flex;
+}
+.selectedBucket .bucketEmailCount{
+    color: white;
+    background-color: #003862;
 }
 .bucket{
-    padding: 7px 20px;
+    padding: 20px;
 }
 .bucket img{
     width: 45px;
     height: 50px;
+}
+.bucketEmailCount{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    border: 2px solid #003862;
+    border-radius: 50%;
+    font-weight: 500;
+    font-size: 18px;
+    float: right;
+    color: #003862;
 }
 .bucketName{
     width: 225px;

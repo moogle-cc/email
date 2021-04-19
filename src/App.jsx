@@ -29,7 +29,8 @@ const App = (props) => {
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
-  let [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
+  const [allEmails, setAllEmails] = useState(undefined);
+  const [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
   // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
@@ -135,6 +136,7 @@ const App = (props) => {
         let tempBuckets = makeBuckets(tempEmailSet);
         localStorage.setItem("buckets", JSON.stringify(tempBuckets));
         setBuckets(tempBuckets);
+        setAllEmails(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
@@ -249,6 +251,7 @@ const App = (props) => {
     let spam = buckets.shift();
     buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
     buckets.push(spam)
+    buckets.unshift({name: "All", emailSet: []})
     return buckets;
   }
 
@@ -277,7 +280,7 @@ const App = (props) => {
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
-          <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+          <EmailList allEmails={allEmails} emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
           {
             emailList.currentEmail ? 
                 <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
