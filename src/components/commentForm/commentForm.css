@@ -1,0 +1,32 @@
+.submitBtn{
+    outline: none;
+    border: none;
+    padding: 15px 18px;
+    color: #fff;
+    border-radius: 50%;
+    background: #FF8B88;
+    position: relative;
+    bottom: 4em;
+    left: 36em;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+.commentForm{
+    padding: 0 5% 0 5%;
+}
+input:focus, textarea:focus, select:focus{
+    outline: none;
+}
+.textArea{
+    width: 95%;
+    min-height: 7em;
+    border: none;
+    margin: 15px;
+}
+.control{
+    border-radius: 20px;
+    box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.4)
+}
+/* .field{
+    margin-right: 10px;
+} */

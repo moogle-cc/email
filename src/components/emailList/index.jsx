@@ -1,9 +1,7 @@
 import React, {useEffect} from 'react';
-
-const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
+// import '../../New.css';
+const EmailList = ({emailList, fqdn, setEmailList}) => {
     useEffect(() => {
-      if(emailList.emailSet)
-        showEmail(emailList.emailSet[0].Key);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
 
@@ -17,53 +15,62 @@ const EmailList = ({emailList, friendlyDate, fqdn, setEmailList}) => {
         if(tempcurrentEmail.emailContent.html) tempemailContent = tempcurrentEmail.emailContent.html;
         else if(tempcurrentEmail.emailContent.textAsHtml) tempemailContent = tempcurrentEmail.emailContent.textAsHtml;
       }
-      if(tempcurrentEmailId) setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail, currentEmailId: tempcurrentEmailId});
+      if(emailList.currentEmail === tempcurrentEmail)setEmailList({...emailList, emailContent: undefined, currentEmail: undefined, currentEmailId: undefined})
+      else if(tempcurrentEmailId) setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail, currentEmailId: tempcurrentEmailId});
       else setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail});
     };
 
+    const splitName = (name) => {
+      const isContainsName = name.includes(' ');
+      if(isContainsName) {
+        const tempName = name.split('<')[0];
+        return tempName.substring(0 , 19)
+      }else {
+        const tempName = name.split('@')[0];
+        return tempName.substring(0 , 19);
+      }
+    }
+    
+    const selectEmail = (idx) => {
+      if(localStorage.buckets){
+        const noOfEmails = document.querySelectorAll('[idx]');
+        noOfEmails.forEach((data) => {
+          if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
+          document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
+        });
+        return true;
+      }
+    }
+    let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
+    let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
     return (
-        <aside className="menu primary-background">
-            <p className="menu-label" style={{fontFamily: "Poppins", fontWeight: "600"}}>
-              Emails
-            </p>
-            <ul className="menu-list" style={{overflowY: "scroll", maxHeight: "95vh"}}>
-              {
-                emailList.emailSet ?
-                emailList.emailSet.map((email, idx)=> (
-                  <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={() => showEmail(email.Key)} className="is-size-6">
-                    {
-                      email.emailContent ? 
-                      <span >
-                        { email.emailContent.subject || "(no subject)"}
-                        {
-                          email.emailContent.headers['x-ses-spam-verdict'] && email.emailContent.headers['x-ses-spam-verdict'] !== 'PASS' ?
-                          <div className="icon-text" >
-                            <span className="icon has-text-warning">
-                              <i className="fas fa-exclamation-triangle"></i>
-                            </span>
-                            <span className="icon is-size-7">&nbsp;Spam</span>
-                          </div> : null
-                        }
-                        {
-                          email.emailContent.headers['x-ses-virus-verdict'] && email.emailContent.headers['x-ses-virus-verdict'] !== 'PASS' ?
-                          <div className="icon-text" >
-                            <span className="icon has-text-danger">
-                              <i className="fas fa-ban"></i>
-                            </span>
-                            <span className="icon is-size-7">&nbsp;Virus!!</span>
-                          </div> : null
-                        } 
-                        <p className="is-size-7"> (to { email.emailContent.to ? email.emailContent.to.text : '[undefined]'} from {email.emailContent.from.text} | { friendlyDate(email.emailContent.date)})</p>
-                      </span>
-                      : null
-                    }
-                    
-                  </li>
-                ))
-                : null
-              }
+      <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
+            <div class="emailHeader flex">
+                <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
+                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {localStorage.buckets ? JSON.parse(localStorage.buckets)[selectedBucketId].name : "Spam"} </span></h1>
+            </div>
+            <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
+                {
+                  emailList.emailSet ?
+                  emailList.emailSet.map((email, idx)=> (
+                    <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
+                      {
+                        email.emailContent ? 
+                          <div className="email flex">
+                            <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
+                            <h3 className="emailUesrname">{ splitName(email.emailContent.from.text) }</h3>
+                            <p className="emailTextPreview">{ `${email.emailContent.subject.slice(0, 60)}...` || "(no subject)"}</p>
+                          </div>
+                        : null
+                      }
+                      
+                    </li>
+                  ))
+                  : <span>{emailList.statusMsg}</span>
+                }  
             </ul>
-          </aside>
+        </div>
+            
     )
 }
 

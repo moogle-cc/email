@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import axios from 'axios';
-import moment from 'moment';
+// import moment from 'moment';
 import AWS from 'aws-sdk';
 import Navbar from './components/navbar';
 import EmailList from './components/emailList';
@@ -10,9 +10,8 @@ import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
 import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
-import CommentForm from './components/commentForm';
-import CommentList from './components/commentList';
 import './App.css';
+import SideBar from './components/sidebar';
 
 const ADDRESS_DELIM = ",";
 const ORIGIN = (new URL(document.location)).origin;
@@ -22,7 +21,7 @@ const API_GW_URL = 'https://api.zeer0.com/v001';
 const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
 const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
 const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comments`;
-const DEFAULT_FQDN = HOST;
+const DEFAULT_FQDN = HOST.startsWith('localhost') ? 'moogle.cc' : HOST;
 const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 // const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
 const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
@@ -46,7 +45,8 @@ const App = (props) => {
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
-  const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
+  let [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
+  // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
     emailContent: undefined,
@@ -118,7 +118,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn && emlId){
       let x = emlId.substring(fqdn.length + 1);
       return await axios({
-        url: `${EMAIL_CONTENT_URL}?id=${x}`,
+        url: `${EMAIL_CONTENT_URL}?domain=${fqdn}&id=${x}`,
         headers: {'Authorization': authDetails.id_token}
       })
       .then( (response) => {
@@ -135,7 +135,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
-        url: `${EMAILS_LIST_URL}?folderpath=/email`,
+        url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
@@ -148,8 +148,10 @@ const App = (props) => {
       })
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
-        let buckets = makeBuckets(tempEmailSet);
-        await setEmailList({...emailList, emailSet: tempEmailSet,currentEmail: tempEmailSet[0],currentEmailId: tempEmailSet[0].Key,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
+        let tempBuckets = makeBuckets(tempEmailSet);
+        localStorage.setItem("buckets", JSON.stringify(tempBuckets));
+        setBuckets(tempBuckets);
+        await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
       });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
@@ -160,11 +162,12 @@ const App = (props) => {
     let hash = (new URL(document.location)).hash;
     let loc = hash ? document.location.href.replace(/#/, '?') : document.location;
     let params = (new URL(loc)).searchParams;
+    
     if(params.get('id_token') && params.get('access_token') && params.get('expires_in') && tokenIsValid(params.get('id_token'))){
       let temp = {
         id_token: params.get('id_token'),
         access_token: params.get('access_token'),
-      };
+      }
       localStorage.setItem("userDetails" ,JSON.stringify(temp));
       setAuthDetails(temp)
     }else{ 
@@ -182,26 +185,26 @@ const App = (props) => {
     }
     return false;
   };
-  const shareableUrl = () => {
-    return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
-  };
+  // const shareableUrl = () => {
+  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
+  // };
  
-  const copyToClipboard = () => {
-    var copyText = document.getElementById("shareable-link");
-    copyText.type = 'text';
-    copyText.select();
-    document.execCommand("copy");
-    copyText.type = 'hidden';
-    setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
-  };
+  // const copyToClipboard = () => {
+  //   var copyText = document.getElementById("shareable-link");
+  //   copyText.type = 'text';
+  //   copyText.select();
+  //   document.execCommand("copy");
+  //   copyText.type = 'hidden';
+  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
+  // };
   
-  const friendlyDate=(d)=>{
-    return moment(d).fromNow();
-  };
+  // const friendlyDate=(d)=>{
+  //   return moment(d).fromNow();
+  // };
 
-  const awsCredentialsAreAvailable=()=>{
-    return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
-  }
+  // const awsCredentialsAreAvailable=()=>{
+  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
+  // }
   
   const getSESObject=(refresh) =>{
     if(keys.accessKeyId && keys.secretAccessKey && keys.region !== ""){
@@ -242,6 +245,25 @@ const App = (props) => {
   const redirectToLogin=() =>{
     window.location.href = loginUrl;
   };
+  const makeBuckets = (emailSet) => {
+    let buckets = [{name: "spam", emailSet: []}];
+    emailSet.forEach((email) => {
+      let name = email.emailContent.headers.to.value[0].name.length>0 ? email.emailContent.headers.to.value[0].name : email.emailContent.headers.to.value[0].address.split("@")[0];
+      let newBucket = name.toLowerCase();
+      let found = buckets.some(buck => buck.name === newBucket);
+      if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
+        buckets[0].emailSet.push(email);
+      }
+      else if(found){
+          let index = buckets.findIndex(buck => buck.name === newBucket);
+          buckets[index].emailSet.push(email)
+      }else{
+          buckets.push({name: newBucket, emailSet: [email]});
+      }
+    });
+    buckets.push(buckets.shift());
+    return buckets;
+  }
 
   const makeBuckets = (emailSet) => {
     let buckets = [];
@@ -277,45 +299,38 @@ const App = (props) => {
   // };
  
   return (
-    <div className="App">
-      <form id="email-contents">
+    <div className="mainEmailContainer">
       {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
-      <Navbar getEmails={getEmails} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} authTokenIsValid={authTokenIsValid} 
-        setAwsModalIsVisible={setAwsModalIsVisible} awsCredentialsAreAvailable={awsCredentialsAreAvailable} />
-      <div className="columns">
-        <div className="column is-one-quarter">
-          <EmailList emailList={emailList} friendlyDate={friendlyDate} fqdn={fqdn} setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} setEmailList={setEmailList}/>
+      <div class="emailContainer">
+        <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
+        <div style={{display: "flex"}}>
+          <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+          {
+            emailList.currentEmail ? 
+                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
+            : null
+          }
         </div>
-        <div className="column is-half">
-          <EmailContent emailList={emailList} />
-        </div>
+      </div>
+      {/* <div className="columns">
         <div className="column  primary-background mx-2">
-          {/* <!-- email actions--> */}
+          {/* <!-- email actions--> *
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}>Reply All</a>
           <input type="hidden" id="shareable-link" value={shareableUrl()} />
           <a role="button" href="/" className="button secondary-icon-style navbar-item" onClick={(e) => {e.preventDefault(); copyToClipboard()}}><span className="icon"><i className="fas fa-share-alt"></i></span><span>Share This Email</span></a>
           <p>
             <sub>{shareableLinkMsg ? <span className="is-size-7" >({shareableLinkMsg})</span> : null}</sub>
           </p>
-          {/* comment */}
-          {
-            emailList.currentEmailId ? 
-              <div className="comments-container mt-4">
-                <CommentForm currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-                <CommentList currentEmailId={emailList.currentEmailId} COMMENT_POST_URL={COMMENT_POST_URL}/>
-              </div>
-            :null
-          }
           
         </div>
-      </div>
+      </div> */}
       <AwsCredentialModal awsModalIsVisible={awsModalIsVisible} setAwsModalIsVisible={setAwsModalIsVisible} 
         deviceIsMobile={deviceIsMobile} keys={keys} setKeys={setKeys} sesRegions={sesRegions} 
         setDataMustBeSavedLocally={setDataMustBeSavedLocally} />
 
       <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} HOST={HOST} emailList={emailList}
         deviceIsMobile={deviceIsMobile} ADDRESS_DELIM={ADDRESS_DELIM} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
-    </form>
     </div>
   )
 }

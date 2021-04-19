@@ -1,0 +1,86 @@
+.emailContent{
+    animation: fadeIn 1s;
+    box-shadow: -10px -2px 5px rgba(0,0,0,0.2);
+    margin: 0 0 0 1vh;
+    padding: 0 0 3vh 0;
+}
+.dontDisplay{
+  display: none !important;
+}
+
+.emailContent .emailHeader img{
+    width: 70px;
+    height: 70px;
+}
+.emailContent  .emailHeader{
+    color: #003862;
+}
+.emailContent  .emailHeader h1{
+    font-size: 33px;
+    font-weight: bold;
+    margin: 0 0 0 25px;
+}
+.emailContent iframe{
+  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y: hidden;
+  width:100%;
+}
+.smallFrame{
+  height: 34em;
+}
+.largeFrame{
+  height: 53em;
+}
+.iframeContainer{
+  height: auto;
+}
+.commentIcon{
+  position: absolute;
+  right: 20px;
+  color: #003862;
+  cursor: pointer;
+}
+.commentIcon span{
+  position: relative;
+  right: 57%;
+  color: white;
+  bottom: 0.9em;
+}
+
+.isInvisible{
+  display: none;
+}
+.showingComments i{
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #003862;
+  color: transparent;
+}
+.showingComments span{
+  color: #003862;
+}
+
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-moz-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-webkit-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-o-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-ms-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
