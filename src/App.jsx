@@ -134,6 +134,7 @@ const App = (props) => {
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
         let tempBuckets = makeBuckets(tempEmailSet);
+        assignReadUnread(tempEmailSet);
         localStorage.setItem("buckets", JSON.stringify(tempBuckets));
         setBuckets(tempBuckets);
         setAllEmails(tempEmailSet);
@@ -253,6 +254,23 @@ const App = (props) => {
     buckets.push(spam)
     buckets.unshift({name: "All", emailSet: []})
     return buckets;
+  }
+  const assignReadUnread = (emailSet) => {
+    let emailReadStatus = []
+    if(!localStorage.emailReadStatus){
+      emailSet.forEach((email) => {
+        emailReadStatus.push({Key: email.Key, readStatus: false});
+      });
+    } else {
+      emailReadStatus = JSON.parse(localStorage.emailReadStatus)
+      let temp = emailReadStatus;
+      let i=0;
+      while(emailSet[i].Key !== temp[0].Key){
+        emailReadStatus.unshift({Key: emailSet[i].key, readStatus: false});
+        i++;
+      }
+    }
+    localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
   }
 
   // const replyAll=async () =>{

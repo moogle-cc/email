@@ -6,7 +6,7 @@ const EmailList = ({emailList, allEmails, fqdn, setEmailList}) => {
     }, [emailList.emailSet]);
 
     const showEmail=(emlId)=>{
-      let tempcurrentEmail = emailList.emailSet.find((e) => e.Key === emlId);
+      let tempcurrentEmail = allEmails.find((e) => e.Key === emlId);
       let tempcurrentEmailId = undefined;
       if(tempcurrentEmail) tempcurrentEmailId = emlId.substring(fqdn.length + 1);
       let tempemailContent = `We could not download the contents of this email ${emlId}.<br> This usually means the email isn't properly formatted. Your email admin should be able to help.`;
@@ -18,6 +18,10 @@ const EmailList = ({emailList, allEmails, fqdn, setEmailList}) => {
       if(emailList.currentEmail === tempcurrentEmail)setEmailList({...emailList, emailContent: undefined, currentEmail: undefined, currentEmailId: undefined})
       else if(tempcurrentEmailId) setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail, currentEmailId: tempcurrentEmailId});
       else setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail});
+      let emailReadStatus = JSON.parse(localStorage.emailReadStatus);
+      let emailReadStatusIndex = emailReadStatus.findIndex(readEmail => readEmail.Key === emlId)
+      emailReadStatus[emailReadStatusIndex].readStatus = true;
+      localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
     };
 
     const splitName = (name) => {
@@ -57,10 +61,10 @@ const EmailList = ({emailList, allEmails, fqdn, setEmailList}) => {
                     <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
                       {
                         email.emailContent ? 
-                          <div className="email flex">
+                          <div className= "email flex ">
                             <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
-                            <h3 className="emailUesrname">{ splitName(email.emailContent.from.text) }</h3>
-                            <p className="emailTextPreview">{ `${email.emailContent.subject.slice(0, 60)}...` || "(no subject)"}</p>
+                            <h3 className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailUesrname": "emailUesrname"}>{ splitName(email.emailContent.from.text) }</h3>
+                            <p className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailTextPreview": "emailTextPreview"}>{ `${email.emailContent.subject.slice(0, 60)}...` || "(no subject)"}</p>
                           </div>
                         : null
                       }

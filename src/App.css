@@ -115,6 +115,9 @@ h1{
 .emailLists{
     padding: 20px 30px;
 }
+.normalFont{
+    font-weight: 300 !important;
+}
 
 .email{
     padding: 3px 0;
