@@ -12,25 +12,9 @@ import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import './App.css';
 import SideBar from './components/sidebar';
-
-const ADDRESS_DELIM = ",";
-const ORIGIN = (new URL(document.location)).origin;
-const HOST = (new URL(document.location)).host;
-const PATHNAME = (new URL(document.location)).pathname.replace(/\/+$/, '');
-const API_GW_URL = 'https://api.zeer0.com/v001';
-const EMAIL_CONTENT_URL = `${API_GW_URL}/moogle/email`;
-const EMAILS_LIST_URL = `${API_GW_URL}/moogle/email/list`;
-const COMMENT_POST_URL = `${API_GW_URL}/moogle/email/comments`;
-const DEFAULT_FQDN = HOST.startsWith('localhost') ? 'moogle.cc' : HOST;
-const LOGIN_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
-// const LOGOUT_REDIRECT_URL = `${ORIGIN}${PATHNAME}`;
-const COGNITO_URL = 'https://moogle.auth.ap-south-1.amazoncognito.com/';
-const CLIENT_ID = '365ebnulu59p2fkp1m6dl0v6gd';
-const RESPONSE_TYPE = 'token';
-const SCOPE = 'email+openid';
-const NEW_EMAIL_CHECKOUT_TIME = 300000;
-const COGNITO_LOGIN_URL = `${COGNITO_URL}/login?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${LOGIN_REDIRECT_URL}`;
-// const COGNITO_LOGOUT_URL = `${COGNITO_URL}/logout?client_id=${CLIENT_ID}&logout_uri=${LOGOUT_REDIRECT_URL}`;
+import {ADDRESS_DELIM, DEFAULT_FQDN, COGNITO_LOGIN_URL, 
+  EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, COMMENT_POST_URL, HOST, 
+  EMAIL_CONTENT_URL} from './constants';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;

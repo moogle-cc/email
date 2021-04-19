@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-// import '../../New.css';
+
 const EmailList = ({emailList, fqdn, setEmailList}) => {
     useEffect(() => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
