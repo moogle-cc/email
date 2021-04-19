@@ -152,7 +152,6 @@ const App = (props) => {
         localStorage.setItem("buckets", JSON.stringify(tempBuckets));
         setBuckets(tempBuckets);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
-        
       });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
@@ -263,6 +262,21 @@ const App = (props) => {
       }
     });
     buckets.push(buckets.shift());
+    return buckets;
+  }
+
+  const makeBuckets = (emailSet) => {
+    let buckets = [];
+    emailSet.forEach((email) => {
+      let newBucket = email.emailContent.from.value[0].address.split("@")[0].toLowerCase();
+      let found = buckets.some(buck => buck.name === newBucket);
+      if(found){
+          let index = buckets.findIndex(buck => buck.name === newBucket);
+          buckets[index].emailSet.push(email)
+      }else{
+          buckets.push({name: newBucket, emailSet: [email]});
+      }
+    });
     return buckets;
   }
 
