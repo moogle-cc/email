@@ -8,7 +8,6 @@ import EmailList from './components/emailList';
 import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
-import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import './App.css';
 import SideBar from './components/sidebar';
@@ -22,7 +21,6 @@ const App = (props) => {
   // const logoutUrl=COGNITO_LOGOUT_URL;
   // const baseUrl = `${ORIGIN}${PATHNAME}`;
   const deviceIsMobile=undefined;
-  const [showToast, setShowToast] = useState(false);
   const [emailComposeModalIsVisible, setEmailComposeModalIsVisible] = useState(undefined);
   const [authDetails, setAuthDetails]= useState(localStorage.userDetails ? JSON.parse(localStorage.userDetails) : undefined);
   const [ses, setSes]= useState(undefined);
@@ -47,22 +45,17 @@ const App = (props) => {
     accessKeyId: undefined,
     region: undefined,
   });
-  
-  
-  let list = [{
-    id: Math.floor((Math.random() * 101) + 1),
-    title: 'Message',
-    description: 'New Emails Availabe Please Refresh',
-  }];
 
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
-    if(e.data.NEW_EMAIL_WAS_FOUND)
-      await setShowToast(true);
+    if(e.data.NEW_EMAIL_WAS_FOUND){
+      document.getElementsByClassName("newEmailHighlighter")[0].setAttribute('id', 'newEmail')
+    }
   });
   useEffect(() => {
     let interval = setInterval(async () => {
-      myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: emailList.emailSet});
+      if(allEmails)
+        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: allEmails});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => clearInterval(interval);
   });
@@ -116,7 +109,9 @@ const App = (props) => {
   };
 
   const getEmails= async ()=> {
-    await setEmailList({...emailList, emailContent: undefined, statusMsg: 'Retrieving...'});
+    console.log("called")
+    await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
+    document.getElementsByClassName("newEmailHighlighter")[0].removeAttribute('id')
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
@@ -265,8 +260,8 @@ const App = (props) => {
       emailReadStatus = JSON.parse(localStorage.emailReadStatus)
       let temp = emailReadStatus;
       let i=0;
-      while(emailSet[i].Key !== temp[0].Key){
-        emailReadStatus.unshift({Key: emailSet[i].key, readStatus: false});
+      while(emailSet[i] && temp[0] && emailSet[i].Key !== temp[0].Key){
+        emailReadStatus.unshift({Key: emailSet[i].Key, readStatus: false});
         i++;
       }
     }
@@ -293,7 +288,6 @@ const App = (props) => {
  
   return (
     <div className="mainEmailContainer">
-      {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
       <SideBar buckets={buckets} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
