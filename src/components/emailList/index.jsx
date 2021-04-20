@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 
-const EmailList = ({emailList, fqdn, setEmailList}) => {
+const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
     useEffect(() => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
@@ -18,6 +18,10 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
       if(emailList.currentEmail === tempcurrentEmail)setEmailList({...emailList, emailContent: undefined, currentEmail: undefined, currentEmailId: undefined})
       else if(tempcurrentEmailId) setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail, currentEmailId: tempcurrentEmailId});
       else setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail});
+      let emailReadStatus = JSON.parse(localStorage.emailReadStatus);
+      let emailReadStatusIndex = emailReadStatus.findIndex(readEmail => readEmail.Key === emlId)
+      emailReadStatus[emailReadStatusIndex].readStatus = true;
+      localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
     };
 
     const splitName = (name) => {
@@ -32,7 +36,7 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
     }
     
     const selectEmail = (idx) => {
-      if(localStorage.buckets){
+      if(buckets){
         const noOfEmails = document.querySelectorAll('[idx]');
         noOfEmails.forEach((data) => {
           if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
@@ -47,7 +51,7 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
       <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {localStorage.buckets ? JSON.parse(localStorage.buckets)[selectedBucketId].name : "Spam"} </span></h1>
+                <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {buckets ? buckets[selectedBucketId].name : "All"} </span></h1>
             </div>
             <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
                 {
@@ -56,10 +60,10 @@ const EmailList = ({emailList, fqdn, setEmailList}) => {
                     <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
                       {
                         email.emailContent ? 
-                          <div className="email flex">
+                          <div className= "email flex ">
                             <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
-                            <h3 className="emailUesrname">{ splitName(email.emailContent.from.text) }</h3>
-                            <p className="emailTextPreview">{ `${email.emailContent.subject.slice(0, 60)}...` || "(no subject)"}</p>
+                            <h3 className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailUesrname": "emailUesrname"}>{ splitName(email.emailContent.from.text) }</h3>
+                            <p className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailTextPreview": "emailTextPreview"}>{ email.emailContent.subject ? `${email.emailContent.subject.slice(0, 60)}...` : "(no subject)"}</p>
                           </div>
                         : null
                       }

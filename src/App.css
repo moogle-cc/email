@@ -96,6 +96,15 @@ h1{
 .headerRightElements .refreshBtn:hover{
     background: rgba(0,0,0,0.07);
 }
+#newEmail{
+    width: 0.5em;
+    height: 0.5em;
+    background: red;
+    border-radius: 50%;
+    position: relative;
+    right: 1.7em;
+    top: .2em;
+}
 .emailListContainer{
     margin: 0 0 3vh 3vw;
 }
@@ -114,6 +123,9 @@ h1{
 }
 .emailLists{
     padding: 20px 30px;
+}
+.normalFont{
+    font-weight: 300 !important;
 }
 
 .email{

@@ -5,10 +5,9 @@ const SideBar = ({buckets, setEmailList}) => {
     
     useEffect(() => {
         if(buckets)
-            document.getElementById(0).classList.add('selectedBucket')
+            selectBucket(0)
     }, [buckets])
     const  showBucketEmail = (index) => {
-        let buckets = JSON.parse(localStorage.buckets);
         setEmailList({
             emailContent: undefined,
             emailSet: buckets[index].emailSet,
@@ -39,15 +38,18 @@ const SideBar = ({buckets, setEmailList}) => {
                     buckets ? 
                     buckets.map((bucket,idx) => (
                         <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={(e) =>{e.preventDefault(); selectBucket(idx); showBucketEmail(idx)}}>
+                        {idx === buckets.length-1 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0"}}/> : null}
                         {
                             <div className="bucket flex">
                                 <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
-                                <h3 className="bucketName">{ bucket.name }</h3>
+                                <h3 className="bucketName">{ bucket.name } </h3>
+                                <span className="bucketEmailCount">{ bucket.emailSet.length}</span>
                             </div>
                         }
+                        {idx === 0 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0"}}/> : null}
                         </li>
                     ))
-                    :null
+                    :'Retrieving....'
                 }                
             </ul>
             <button className="editorBtn">

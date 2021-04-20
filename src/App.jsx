@@ -8,7 +8,6 @@ import EmailList from './components/emailList';
 import EmailContent from './components/emailContent';
 import AwsCredentialModal from './components/awsCredentialModal';
 import EmailComposeModal from './components/emailComposeModal';
-import Toast from './components/toast';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import './App.css';
 import SideBar from './components/sidebar';
@@ -22,14 +21,14 @@ const App = (props) => {
   // const logoutUrl=COGNITO_LOGOUT_URL;
   // const baseUrl = `${ORIGIN}${PATHNAME}`;
   const deviceIsMobile=undefined;
-  const [showToast, setShowToast] = useState(false);
   const [emailComposeModalIsVisible, setEmailComposeModalIsVisible] = useState(undefined);
   const [authDetails, setAuthDetails]= useState(localStorage.userDetails ? JSON.parse(localStorage.userDetails) : undefined);
   const [ses, setSes]= useState(undefined);
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
-  let [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
+  // const [allEmails, setAllEmails] = useState(undefined);
+  const [buckets, setBuckets] = useState(undefined)
   // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
@@ -46,22 +45,17 @@ const App = (props) => {
     accessKeyId: undefined,
     region: undefined,
   });
-  
-  
-  let list = [{
-    id: Math.floor((Math.random() * 101) + 1),
-    title: 'Message',
-    description: 'New Emails Availabe Please Refresh',
-  }];
 
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
-    if(e.data.NEW_EMAIL_WAS_FOUND)
-      await setShowToast(true);
+    if(e.data.NEW_EMAIL_WAS_FOUND){
+      document.getElementsByClassName("newEmailHighlighter")[0].setAttribute('id', 'newEmail')
+    }
   });
   useEffect(() => {
     let interval = setInterval(async () => {
-      myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: emailList.emailSet});
+      if(buckets[0].emailSet)
+        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => clearInterval(interval);
   });
@@ -115,7 +109,9 @@ const App = (props) => {
   };
 
   const getEmails= async ()=> {
-    await setEmailList({...emailList, emailContent: undefined, statusMsg: 'Retrieving...'});
+    await setBuckets(undefined);
+    await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
+    document.getElementsByClassName("newEmailHighlighter")[0].removeAttribute('id')
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
@@ -133,8 +129,8 @@ const App = (props) => {
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
         let tempBuckets = makeBuckets(tempEmailSet);
-        localStorage.setItem("buckets", JSON.stringify(tempBuckets));
-        setBuckets(tempBuckets);
+        await setBuckets(tempBuckets);
+        assignReadUnread(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
       });
     } else {
@@ -169,26 +165,6 @@ const App = (props) => {
     }
     return false;
   };
-  // const shareableUrl = () => {
-  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
-  // };
- 
-  // const copyToClipboard = () => {
-  //   var copyText = document.getElementById("shareable-link");
-  //   copyText.type = 'text';
-  //   copyText.select();
-  //   document.execCommand("copy");
-  //   copyText.type = 'hidden';
-  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
-  // };
-  
-  // const friendlyDate=(d)=>{
-  //   return moment(d).fromNow();
-  // };
-
-  // const awsCredentialsAreAvailable=()=>{
-  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
-  // }
   
   const getSESObject=(refresh) =>{
     if(keys.accessKeyId && keys.secretAccessKey && keys.region !== ""){
@@ -245,9 +221,49 @@ const App = (props) => {
           buckets.push({name: newBucket, emailSet: [email]});
       }
     });
-    buckets.push(buckets.shift());
+    let spam = buckets.shift();
+    buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
+    buckets.push(spam)
+    buckets.unshift({name: "All", emailSet: emailSet})
     return buckets;
   }
+  const assignReadUnread = (emailSet) => {
+    let emailReadStatus = []
+    if(!localStorage.emailReadStatus){
+      emailSet.forEach((email) => {
+        emailReadStatus.push({Key: email.Key, readStatus: false});
+      });
+    } else {
+      emailReadStatus = JSON.parse(localStorage.emailReadStatus)
+      let temp = emailReadStatus;
+      let i=0;
+      while(emailSet[i] && temp[0] && emailSet[i].Key !== temp[0].Key){
+        emailReadStatus.unshift({Key: emailSet[i].Key, readStatus: false});
+        i++;
+      }
+    }
+    localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
+  }
+  // const shareableUrl = () => {
+  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
+  // };
+ 
+  // const copyToClipboard = () => {
+  //   var copyText = document.getElementById("shareable-link");
+  //   copyText.type = 'text';
+  //   copyText.select();
+  //   document.execCommand("copy");
+  //   copyText.type = 'hidden';
+  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
+  // };
+  
+  // const friendlyDate=(d)=>{
+  //   return moment(d).fromNow();
+  // };
+
+  // const awsCredentialsAreAvailable=()=>{
+  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
+  // }
 
   const makeBuckets = (emailSet) => {
     let buckets = [];
@@ -284,7 +300,6 @@ const App = (props) => {
  
   return (
     <div className="mainEmailContainer">
-      {showToast ? <Toast setShowToast={setShowToast} toastList={list} /> : null}
       <SideBar buckets={buckets} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />

@@ -1,9 +1,9 @@
 .commentList{
     padding: 2em 0 0 2em;
+    background: rgba(0,0,0,0.07);
     
 }
 .commentList ul{
     overflow-y: scroll;
     max-height: 20em;
-    background: rgba(0,0,0,0.07);
 }
