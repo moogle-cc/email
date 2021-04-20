@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 
-const EmailList = ({emailList, buckets, allEmails, fqdn, setEmailList}) => {
+const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
     useEffect(() => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
 
     const showEmail=(emlId)=>{
-      let tempcurrentEmail = allEmails.find((e) => e.Key === emlId);
+      let tempcurrentEmail = emailList.emailSet.find((e) => e.Key === emlId);
       let tempcurrentEmailId = undefined;
       if(tempcurrentEmail) tempcurrentEmailId = emlId.substring(fqdn.length + 1);
       let tempemailContent = `We could not download the contents of this email ${emlId}.<br> This usually means the email isn't properly formatted. Your email admin should be able to help.`;
@@ -47,7 +47,6 @@ const EmailList = ({emailList, buckets, allEmails, fqdn, setEmailList}) => {
     }
     let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
     let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
-    let emailSet = selectedBucketId === '0' ? allEmails : emailList.emailSet;
     return (
       <div class="emailListContainer" style={{"width": emailList.currentEmail ? "50%" : "100%"}}>
             <div class="emailHeader flex">
@@ -56,8 +55,8 @@ const EmailList = ({emailList, buckets, allEmails, fqdn, setEmailList}) => {
             </div>
             <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
                 {
-                  emailSet ?
-                  emailSet.map((email, idx)=> (
+                  emailList.emailSet ?
+                  emailList.emailSet.map((email, idx)=> (
                     <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
                       {
                         email.emailContent ? 

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import "./sidebar.css"
 
-const SideBar = ({buckets, allEmails, setEmailList}) => {
+const SideBar = ({buckets, setEmailList}) => {
     
     useEffect(() => {
         if(buckets)
@@ -43,7 +43,7 @@ const SideBar = ({buckets, allEmails, setEmailList}) => {
                             <div className="bucket flex">
                                 <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
                                 <h3 className="bucketName">{ bucket.name } </h3>
-                                <span className="bucketEmailCount">{idx === 0 ? 100 : bucket.emailSet.length}</span>
+                                <span className="bucketEmailCount">{ bucket.emailSet.length}</span>
                             </div>
                         }
                         {idx === 0 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0"}}/> : null}

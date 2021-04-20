@@ -27,7 +27,7 @@ const App = (props) => {
   const [awsModalIsVisible, setAwsModalIsVisible]= useState(undefined);
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
-  const [allEmails, setAllEmails] = useState(undefined);
+  // const [allEmails, setAllEmails] = useState(undefined);
   const [buckets, setBuckets] = useState(undefined)
   // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
@@ -54,8 +54,8 @@ const App = (props) => {
   });
   useEffect(() => {
     let interval = setInterval(async () => {
-      if(allEmails)
-        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: allEmails});
+      if(buckets[0].emailSet)
+        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => clearInterval(interval);
   });
@@ -109,7 +109,6 @@ const App = (props) => {
   };
 
   const getEmails= async ()=> {
-    await setAllEmails(undefined)
     await setBuckets(undefined);
     await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
     document.getElementsByClassName("newEmailHighlighter")[0].removeAttribute('id')
@@ -131,7 +130,6 @@ const App = (props) => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
         let tempBuckets = makeBuckets(tempEmailSet);
         await setBuckets(tempBuckets);
-        await setAllEmails(tempEmailSet);
         assignReadUnread(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
@@ -227,7 +225,7 @@ const App = (props) => {
     let spam = buckets.shift();
     buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
     buckets.push(spam)
-    buckets.unshift({name: "All", emailSet: []})
+    buckets.unshift({name: "All", emailSet: emailSet})
     return buckets;
   }
   const assignReadUnread = (emailSet) => {
@@ -288,11 +286,11 @@ const App = (props) => {
  
   return (
     <div className="mainEmailContainer">
-      <SideBar buckets={buckets} allEmails={allEmails} setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
-          <EmailList allEmails={allEmails} emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
+          <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
           {
             emailList.currentEmail ? 
                 <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
