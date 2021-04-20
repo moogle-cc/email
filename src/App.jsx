@@ -265,21 +265,6 @@ const App = (props) => {
   //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
   // }
 
-  const makeBuckets = (emailSet) => {
-    let buckets = [];
-    emailSet.forEach((email) => {
-      let newBucket = email.emailContent.from.value[0].address.split("@")[0].toLowerCase();
-      let found = buckets.some(buck => buck.name === newBucket);
-      if(found){
-          let index = buckets.findIndex(buck => buck.name === newBucket);
-          buckets[index].emailSet.push(email)
-      }else{
-          buckets.push({name: newBucket, emailSet: [email]});
-      }
-    });
-    return buckets;
-  }
-
   // const replyAll=async () =>{
   //   setEmailList({...emailList, statusMsg: 'Composing Reply...'})
   //   if(authTokenIsValid() && fqdn){
