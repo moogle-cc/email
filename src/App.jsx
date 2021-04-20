@@ -28,7 +28,7 @@ const App = (props) => {
   const [sesRegions,setSesRegions]= useState(undefined);
   const [dataMustBeSavedLocally,setDataMustBeSavedLocally]= useState(undefined);
   const [allEmails, setAllEmails] = useState(undefined);
-  const [buckets, setBuckets] = useState(localStorage.buckets ? JSON.parse(localStorage.buckets): null)
+  const [buckets, setBuckets] = useState(undefined)
   // const [shareableLinkMsg, setShareableLinkMsg]= useState(undefined);
 
   const [emailList, setEmailList] = useState({
@@ -109,7 +109,8 @@ const App = (props) => {
   };
 
   const getEmails= async ()=> {
-    console.log("called")
+    await setAllEmails(undefined)
+    await setBuckets(undefined);
     await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
     document.getElementsByClassName("newEmailHighlighter")[0].removeAttribute('id')
     if(authTokenIsValid() && fqdn){
@@ -129,10 +130,9 @@ const App = (props) => {
       .then(async values => {
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
         let tempBuckets = makeBuckets(tempEmailSet);
+        await setBuckets(tempBuckets);
+        await setAllEmails(tempEmailSet);
         assignReadUnread(tempEmailSet);
-        localStorage.setItem("buckets", JSON.stringify(tempBuckets));
-        setBuckets(tempBuckets);
-        setAllEmails(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
         
       });
@@ -168,26 +168,6 @@ const App = (props) => {
     }
     return false;
   };
-  // const shareableUrl = () => {
-  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
-  // };
- 
-  // const copyToClipboard = () => {
-  //   var copyText = document.getElementById("shareable-link");
-  //   copyText.type = 'text';
-  //   copyText.select();
-  //   document.execCommand("copy");
-  //   copyText.type = 'hidden';
-  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
-  // };
-  
-  // const friendlyDate=(d)=>{
-  //   return moment(d).fromNow();
-  // };
-
-  // const awsCredentialsAreAvailable=()=>{
-  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
-  // }
   
   const getSESObject=(refresh) =>{
     if(keys.accessKeyId && keys.secretAccessKey && keys.region !== ""){
@@ -267,6 +247,26 @@ const App = (props) => {
     }
     localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
   }
+  // const shareableUrl = () => {
+  //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;
+  // };
+ 
+  // const copyToClipboard = () => {
+  //   var copyText = document.getElementById("shareable-link");
+  //   copyText.type = 'text';
+  //   copyText.select();
+  //   document.execCommand("copy");
+  //   copyText.type = 'hidden';
+  //   setShareableLinkMsg("Copied email url. Now, bookmark or share the url with others.");
+  // };
+  
+  // const friendlyDate=(d)=>{
+  //   return moment(d).fromNow();
+  // };
+
+  // const awsCredentialsAreAvailable=()=>{
+  //   return dataMustBeSavedLocally ? localStorage.accessKeyId && localStorage.secretAccessKey && localStorage.region && localStorage.productLicenseKey: keys.accessKeyId && keys.secretAccessKey && keys.region && keys.productLicenseKey;
+  // }
 
   // const replyAll=async () =>{
   //   setEmailList({...emailList, statusMsg: 'Composing Reply...'})
@@ -288,7 +288,7 @@ const App = (props) => {
  
   return (
     <div className="mainEmailContainer">
-      <SideBar buckets={buckets} setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} allEmails={allEmails} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
