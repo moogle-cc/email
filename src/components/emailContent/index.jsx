@@ -64,7 +64,6 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
     }
     return(
         <div id="email-content" style={{width: "50%"}}className="emailContent">
-            {console.log((emailList.currentEmail))}
             <div class="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
                 <h3 class="flex  align-center" style={{width: "86%"}}> 
@@ -81,7 +80,7 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
                 </div>
             </div>
             <div className="emailMetaData normalFont"> 
-                <div style={{maxWidth: "80%"}}>Send to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
+                <div style={{maxWidth: "80%"}}>Sent to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
                 <div style={{marginLeft: "auto"}}>Size: {emailList.currentEmail.Size} bytes</div>
             </div>
             {

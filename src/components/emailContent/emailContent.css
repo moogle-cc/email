@@ -9,8 +9,7 @@
 }
 .emailMetaData{
   color: #003862;
-  margin-left: 1em;
-  margin-right: 1em;
+  margin: 0 1em 1em 1em;
   display: flex;
 }
 .icons{

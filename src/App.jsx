@@ -57,8 +57,8 @@ const App = (props) => {
       if(buckets[0].emailSet)
         myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
     }, NEW_EMAIL_CHECKOUT_TIME);
-    return () => clearInterval(interval);
-  });
+    return () => {clearInterval(interval)};
+  }, [buckets]);
 
   useEffect(() => {
     if(localStorage.getItem("userDetails") && !authDetails){
@@ -206,19 +206,24 @@ const App = (props) => {
   const makeBuckets = (emailSet) => {
     let buckets = [{name: "spam", emailSet: []}];
     emailSet.forEach((email) => {
-      let name = email.emailContent.to.value[0].name.length>0 ? email.emailContent.to.value[0].name : email.emailContent.to.value[0].address.split("@")[0];
-      let newBucket = name.toLowerCase();
-      let found = buckets.some(buck => buck.name === newBucket);
-      if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
-        buckets[0].emailSet.push(email);
-      }
-      else if(found){
-          let index = buckets.findIndex(buck => buck.name === newBucket);
-          buckets[index].emailSet.push(email)
-      }else{
-          buckets.push({name: newBucket, emailSet: [email]});
-      }
-    });
+      email.emailContent.to.value.forEach(sentTo => {
+        if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
+          let name = sentTo.name.length>0 ? sentTo.name : sentTo.address.split("@")[0];
+          let newBucket = name.toLowerCase();
+          let found = buckets.some(buck => buck.name === newBucket);
+          if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
+            buckets[0].emailSet.push(email);
+          }
+          else if(found){
+              let index = buckets.findIndex(buck => buck.name === newBucket);
+              buckets[index].emailSet.push(email)
+          }else{
+              buckets.push({name: newBucket, emailSet: [email]});
+          }
+        }
+      });
+    })
+      
     let spam = buckets.shift();
     buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
     buckets.push(spam)
