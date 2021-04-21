@@ -1,4 +1,6 @@
 import React, {useEffect} from 'react';
+import moment from 'moment';
+import './emailList.css';
 
 const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
     useEffect(() => {
@@ -53,7 +55,7 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
                 <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {buckets ? buckets[selectedBucketId].name : "All"} </span></h1>
             </div>
-            <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "95vh"}}>
+            <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "80vh"}}>
                 {
                   emailList.emailSet ?
                   emailList.emailSet.map((email, idx)=> (
@@ -64,6 +66,7 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
                             <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
                             <h3 className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailUesrname": "emailUesrname"}>{ splitName(email.emailContent.from.text) }</h3>
                             <p className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailTextPreview": "emailTextPreview"}>{ email.emailContent.subject ? `${email.emailContent.subject.slice(0, 60)}...` : "(no subject)"}</p>
+                            <div className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailDatePreview": "emailDatePreview"}>{moment(email.emailContent.date).format('DD/MM/YYYY')}</div>
                           </div>
                         : null
                       }

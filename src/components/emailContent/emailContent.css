@@ -1,5 +1,5 @@
 .emailContent{
-    animation: fadeIn 1s;
+    /* animation: fadeIn 1s; */
     box-shadow: -10px -2px 5px rgba(0,0,0,0.2);
     margin: 0 0 0 1vh;
     padding: 0 0 3vh 0;
@@ -7,7 +7,23 @@
 .dontDisplay{
   display: none !important;
 }
-
+.emailMetaData{
+  color: #003862;
+  margin: 0 1em 1em 1em;
+  display: flex;
+}
+.icons{
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+.attachmentIcon{
+  padding: 0.9em 0.5em 0 1em;
+  cursor: pointer;
+}
+.attachmentsContainer{
+  padding: 1em 1em;
+}
 .emailContent .emailHeader img{
     width: 70px;
     height: 70px;
@@ -30,22 +46,22 @@
   height: 34em;
 }
 .largeFrame{
-  height: 53em;
+  height: 45em;
 }
-.iframeContainer{
+/* .iframeContainer{
   height: auto;
-}
+} */
 .commentIcon{
-  position: absolute;
-  right: 20px;
-  color: #003862;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .commentIcon span{
   position: relative;
   right: 57%;
   color: white;
-  bottom: 0.9em;
+  bottom: 0.2em;
 }
 
 .isInvisible{
