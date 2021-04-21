@@ -1,0 +1,43 @@
+.emailListContainer{
+    margin: 0 0 0 3vw;
+}
+.emailListContainer .emailHeader{
+    padding: 10px 0;
+    color: #003862;
+}
+.emailListContainer .emailHeader h1{
+    font-size: 33px;
+    font-weight: bold;
+    margin: 0 0 0 25px;
+}
+.emailListContainer .emailHeader img{
+    width: 70px;
+    height: 70px;
+}
+.emailLists{
+    padding: 20px 30px 0 30px;
+}
+.emailUesrname{
+    width: 225px;
+    padding: 0 30px 0 35px;
+    font-weight: 500;
+    font-size: 18px;
+    color: #003862;
+    margin: auto 10px !important;
+    overflow: hidden;
+}
+.emailDatePreview{
+    color: #003862;
+    font-weight: 430;
+    margin-left: auto;
+}
+.emailTextPreview{
+    color: #003862;
+    font-weight: 430;
+    margin: auto 0;
+}
+.selectedEmail{
+    box-shadow: 0 0 5px rgba(0,0,0,0.4);
+    border-radius: 20px;
+    width:98%;
+}

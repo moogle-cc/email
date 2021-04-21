@@ -109,9 +109,7 @@ const App = (props) => {
   };
 
   const getEmails= async ()=> {
-    await setBuckets(undefined);
     await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
-    document.getElementsByClassName("newEmailHighlighter")[0].removeAttribute('id')
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
@@ -132,7 +130,7 @@ const App = (props) => {
         await setBuckets(tempBuckets);
         assignReadUnread(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
-      });
+      })
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
       redirectToLogin();
@@ -208,7 +206,7 @@ const App = (props) => {
   const makeBuckets = (emailSet) => {
     let buckets = [{name: "spam", emailSet: []}];
     emailSet.forEach((email) => {
-      let name = email.emailContent.headers.to.value[0].name.length>0 ? email.emailContent.headers.to.value[0].name : email.emailContent.headers.to.value[0].address.split("@")[0];
+      let name = email.emailContent.to.value[0].name.length>0 ? email.emailContent.to.value[0].name : email.emailContent.to.value[0].address.split("@")[0];
       let newBucket = name.toLowerCase();
       let found = buckets.some(buck => buck.name === newBucket);
       if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
@@ -284,7 +282,8 @@ const App = (props) => {
   // };
  
   return (
-    <div className="mainEmailContainer">
+    
+    <div className="mainEmailContainer" style={{height: "100vh"}}>
       <SideBar buckets={buckets} setEmailList={setEmailList}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
@@ -297,6 +296,7 @@ const App = (props) => {
           }
         </div>
       </div>
+      
       {/* <div className="columns">
         <div className="column  primary-background mx-2">
           {/* <!-- email actions--> *

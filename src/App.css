@@ -105,25 +105,7 @@ h1{
     right: 1.7em;
     top: .2em;
 }
-.emailListContainer{
-    margin: 0 0 3vh 3vw;
-}
-.emailListContainer .emailHeader{
-    padding: 10px 0;
-    color: #003862;
-}
-.emailListContainer .emailHeader h1{
-    font-size: 33px;
-    font-weight: bold;
-    margin: 0 0 0 25px;
-}
-.emailListContainer .emailHeader img{
-    width: 70px;
-    height: 70px;
-}
-.emailLists{
-    padding: 20px 30px;
-}
+
 .normalFont{
     font-weight: 300 !important;
 }
@@ -134,23 +116,4 @@ h1{
 .email img{
     width: 45px;
     height: 50px;
-}
-.emailUesrname{
-    width: 225px;
-    padding: 0 30px 0 35px;
-    font-weight: 500;
-    font-size: 18px;
-    color: #003862;
-    margin: auto 10px !important;
-    overflow: hidden;
-}
-.emailTextPreview{
-    color: #003862;
-    font-weight: 430;
-    margin: auto 0;
-}
-.selectedEmail{
-    box-shadow: 0 0 5px rgba(0,0,0,0.4);
-    border-radius: 20px;
-    width:98%;
 }
