@@ -27,7 +27,6 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
         let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
         let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
         let tempFromEmail = getFromEmail();
-        console.log(tempToEmail, tempCcEmail);
         if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
         if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
         let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
@@ -45,6 +44,8 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
       if(emailContent && emailContent.from){
         emailContent.from.value.forEach(value => email.push(value.address));
       }
+      if(emailContent && emailContent.to)
+        emailContent.to.value.forEach(value => email.push(value.address));
       return email;
     }
 
