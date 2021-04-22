@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import JoditEditor from "jodit-react";
-import { EMAIL_ADDRESS_DELIM } from '../../constants';
+import {ADDRESS_DELIM, DEFAULT_FQDN } from '../../constants';
 
-const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ADDRESS_DELIM, ses, HOST, emailComposeModalIsVisible}) => {
+const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ses, emailComposeModalIsVisible}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
       toEmail: undefined,
       ccEmail: undefined,
-      sender: localStorage.userDetails ? JSON.parse(atob(JSON.parse(localStorage.userDetails).id_token.split('.')[1])).email : undefined,
+      sender: undefined,
       emailSubject: undefined,
     });
     const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
@@ -24,67 +24,41 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
     const setEmailDestinations= async () =>{
       if(emailList.currentEmail && emailList.currentEmail.emailContent){
         let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
-        let tempToEmail = makeTo();
-        let tempCcEmail = makeCc();
-        let tempFromEmail = makeFrom()[0];
+        let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
+        let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
+        let tempFromEmail = getFromEmail(emailList.currentEmail.emailContent);
         if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
         if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
         let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
         duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
         tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
         tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
-        let tempSender = getSender();
-        await setSendEmailDetails({sender: tempSender, ccEmail: tempCcEmail, fromEmail: tempFromEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
+        await setSendEmailDetails({sender: tempFromEmail, ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
       }
     };
     const clearEmailDestinations= ()=>{
       setSendEmailDetails({sender: undefined, ccEmail: undefined, fromEmail: undefined, emailSubject: undefined, toEmail: undefined})
     };
+    const getToEmail = (emailContent) => {
+      let email = [];
+      if(emailContent.from)
+        emailContent.from.value.forEach(value => email.push(value.address)) 
+      return email;
+    }
 
-    const makeTo = () =>{
-      let toList = makeAddressList(`to`);
-      let from = getSender(`from`);
-      if(toList && from){
-        if(toList.indexOf(from) === -1){
-          toList.push(from);
-        }
+    const getFromEmail = (emailContent) => {
+      let email =[];
+      if(emailContent.to)
+        emailContent.to.value.forEach(value => {if(value.address.split("@")[1] === DEFAULT_FQDN) email.push(value.address)})
+      return email;
+    }
+    const getCcEmail = (emailContent) => {
+      let email =[];
+      if(emailContent.cc){
+        emailContent.cc.value.forEach(value => email.push(value.address));
       }
-      return toList;
-    };
-
-    const makeCc = () =>{
-      let ccList = makeAddressList(`cc`);
-      let from = getSender(`from`);
-      if(ccList && from){
-        if(ccList.indexOf(from) === -1){
-          ccList.push(from);
-        }
-      }
-      return ccList;
-    };
-
-    const makeFrom = () => {
-      return [...makeAddressList(`to`), ...makeAddressList(`cc`)]
-      .filter(email => email.indexOf(`${EMAIL_ADDRESS_DELIM}${HOST}`) > -1 || email.indexOf(`@ramachandr.in`) > -1);
-    };
-    const getSender=()=>{
-      let from = makeAddressList(`from`);
-      return from && from.length === 1 ? from[0] : undefined;
-    };
-
-    const makeAddressList = (type) => {
-      let ec = emailList.currentEmail.emailContent;
-      let key = type.toLowerCase();
-      if([`to`, `cc`, `from`].includes(key) && 
-      ec[key] &&
-      ec[key].value){
-        return ec[key].value.reduce((accum, v) => {
-          accum.push(v.address);
-          return accum;
-        }, []);
-      }
-      return [];
-    };
+      return email;
+    }
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -195,7 +169,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
                     </div>
                     <div className="field">
                       <div className="control has-icons-left">
-                          <input className="input" type="email" readOnly placeholder="FROM: email" value={sendEmailDetails.sender} name="sender" />
+                          <input className="input" type="email" placeholder="FROM: email" value={sendEmailDetails.sender} name="sender" onChange={handleChange}/>
                           <sub>(Enter a valid FROM email)</sub>
                           <span className="icon is-small is-left">
                             <i className="fa fa-envelope"></i>
