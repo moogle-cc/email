@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import "./sidebar.css"
 
-const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible}) => {
+const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible, setIsReply}) => {
     
     useEffect(() => {
         if(buckets)
@@ -25,6 +25,11 @@ const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible}) => {
         // document.querySelector('[id="'+idx+'"]').classList.add('selectedBucket');
         return true;
       }
+    const handleComposeEmail = async(e) => {
+        e.preventDefault();
+        await setEmailComposeModalIsVisible(true); 
+        await setIsReply(false)
+    }
     return(
         <div className="left-panel">
             <div className="moogle-logo">
@@ -52,7 +57,7 @@ const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible}) => {
                     :'Retrieving....'
                 }                
             </ul>
-            <button className="editorBtn" onClick={() => setEmailComposeModalIsVisible(true)}>
+            <button className="editorBtn" onClick={handleComposeEmail}>
                 <i className="fa fa-pencil" ></i>
             </button>
         </div>
