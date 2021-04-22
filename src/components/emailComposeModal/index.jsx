@@ -78,40 +78,22 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
     }
     const sendEmail = (e) => {
       if(sendEmailDetails.toEmail && sendEmailDetails.sender){
-          var params = {
-            Destination: { /* required */
-              ToAddresses: sendEmailDetails.toEmail && sendEmailDetails.toEmail.split(ADDRESS_DELIM).length > 0 ? sendEmailDetails.toEmail.split(ADDRESS_DELIM) : [
-                sendEmailDetails.toEmail,
-                /* more items */
-              ],
-              CcAddresses: sendEmailDetails.ccEmail && sendEmailDetails.ccEmail.split(ADDRESS_DELIM).length > 0 ? sendEmailDetails.ccEmail.split(ADDRESS_DELIM) : [
-                sendEmailDetails.ccEmail,
-                /* more items */
-              ],
-              BccAddresses: sendEmailDetails.bccEmail && sendEmailDetails.bccEmail.split(ADDRESS_DELIM).length > 0 ? sendEmailDetails.bccEmail.split(ADDRESS_DELIM) : [
-                sendEmailDetails.bccEmail,
-                /* more items */
-              ],
-            },
-            Message: { /* required */
-              Body: { /* required */
-                Html: {
-                  Data: htmlEmailContent ?? "<br>", /* required */
-                  Charset: 'UTF-8'
-                },
-                Text: {
-                  Data: document.getElementsByClassName("editor")[0].innerText ?? "\n", /* required */
-                  Charset: 'UTF-8'
-                }
-              },
-              Subject: { /* required */
-                Data: `${sendEmailDetails.emailSubject ?? "(no subject)"}`, /* required */
-                Charset: 'UTF-8'
-              }
-            },
-            Source: sendEmailDetails.sender, /* required */
+          let toEmail = sendEmailDetails.toEmail || [];
+          let ccEmail = sendEmailDetails.ccEmail || []
+          if(!Array.isArray(toEmail)) toEmail = toEmail.split(ADDRESS_DELIM)
+          if(!Array.isArray(ccEmail)) ccEmail = ccEmail.split(ADDRESS_DELIM)
+          toEmail = toEmail.map(email => email.trim());
+          ccEmail = ccEmail.map(email => email.trim());
+          var body = {
+            to: toEmail,
+            cc: ccEmail,
+            from_email: sendEmailDetails.sender,
+            from_name: sendEmailDetails.sender.split("@")[0],
+            subject: sendEmailDetails.emailSubject,
+            text_part: document.getElementById("editor").innerText,
+            html_part: htmlEmailContent,
           };
-          console.log(params)
+          console.log(body)
           setEmailSendStatus('success')
           setEmailSendStatusMessage('Sending...');
           // await ses.sendEmail(params).promise()
@@ -186,7 +168,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
                     </div>
                   </div>
                   <div className="field">
-                    <div className="control editor">
+                    <div className="control" id="editor">
                       <JoditEditor
                         ref={editor}
                         value={htmlEmailContent}
