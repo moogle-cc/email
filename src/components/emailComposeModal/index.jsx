@@ -52,7 +52,11 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
 
     const getFromEmail = () => {
       let idToken = JSON.parse(localStorage.userDetails).id_token;
-      return `${JSON.parse(atob(idToken.split('.')[1]))["cognito:username"]}@moogle.cc`
+      let username = JSON.parse(atob(idToken.split('.')[1]))["cognito:username"];
+      let email = JSON.parse(atob(idToken.split('.')[1])).email.split("@")[0];
+      if(username)
+        return `${username}@moogle.cc`;
+      return `${email}@moogle.cc`
     }
     const getCcEmail = (emailContent) => {
       let email =[];
