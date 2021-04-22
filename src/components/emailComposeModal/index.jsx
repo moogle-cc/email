@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import JoditEditor from "jodit-react";
 import { ADDRESS_DELIM } from '../../constants';
 
-const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ses, emailComposeModalIsVisible}) => {
+const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, emailComposeModalIsVisible, isReply}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
       toEmail: undefined,
       ccEmail: undefined,
@@ -12,17 +12,17 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
     const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
     const [emailSendStatus, setEmailSendStatus] = useState(undefined);
     const [emailSendStatusMessage, setEmailSendStatusMessage]= useState(undefined);
-
+    console.log(sendEmailDetails)
     useEffect(() => {
       if(emailList.currentEmail){
         clearEmailDestinations();
         setEmailDestinations();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [emailList.currentEmail])
+    }, [emailList.currentEmail, isReply])
 
     const setEmailDestinations= async () =>{
-      if(emailList.currentEmail && emailList.currentEmail.emailContent){
+      if(emailList.currentEmail && emailList.currentEmail.emailContent && isReply){
         let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
         let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
         let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
@@ -36,8 +36,8 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
         await setSendEmailDetails({sender: tempFromEmail, ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
       }
     };
-    const clearEmailDestinations= ()=>{
-      setSendEmailDetails({sender: undefined, ccEmail: undefined, fromEmail: undefined, emailSubject: undefined, toEmail: undefined})
+    const clearEmailDestinations= async ()=>{
+      await setSendEmailDetails({sender: "", ccEmail: "", emailSubject: "", toEmail: ""})
     };
     const getToEmail = (emailContent) => {
       let email =[];
@@ -78,6 +78,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
       showWordsCounter: false,
     }
     const sendEmail = (e) => {
+      e.preventDefault();
       if(sendEmailDetails.toEmail && sendEmailDetails.sender){
           let toEmail = sendEmailDetails.toEmail || [];
           let ccEmail = sendEmailDetails.ccEmail || []
@@ -124,7 +125,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
     return (
         <div id="emailComposeModal" className={emailComposeModalIsVisible ? 'is-active modal':'modal'}>
             <div className="modal-background" style={{"opacity":"75%"}} ></div>
-            <div className="modal-card" style={deviceIsMobile ? {'width': '90vw'} :{width: '90%'}}>
+            <div className="modal-card" style={{width: '90%'}}>
             <header className="modal-card-head">
                 <p className="modal-card-title is-medium">New Email: Frontpage</p>
                 <p className={emailSendStatus === 'success'? 'has-text-primary' : 'has-text-danger'}><sub> {emailSendStatusMessage}</sub></p>
@@ -174,8 +175,8 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
                         ref={editor}
                         value={htmlEmailContent}
                         config={config}
-                        tabIndex={1} // tabIndex of textarea
-                        onBlur={newContent => setHtmlEmailContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                        tabIndex={1}
+                        onBlur={newContent => setHtmlEmailContent(newContent)} 
                         onChange={newContent => {}}
                       />
                     </div>

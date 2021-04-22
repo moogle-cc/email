@@ -5,7 +5,7 @@ import axios from 'axios';
 import moment from 'moment';
 import "./emailContent.css";
 
-const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisible}) => {
+const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisible, setIsReply}) => {
     const [commentArray, setCommentArray] = useState([]);
     useEffect(() => {
         if(emailList.currentEmailId)
@@ -35,7 +35,7 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
     };
     const attachments = ()=>{
         if(emailList.currentEmail){
-            console.log(`looking for attachments @ emailContent.attachments ${Object.keys(emailList.currentEmail.emailContent)}`);
+            // console.log(`looking for attachments @ emailContent.attachments ${Object.keys(emailList.currentEmail.emailContent)}`);
             return emailList.currentEmail.emailContent.attachments;
         } 
         return undefined;
@@ -62,6 +62,11 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
         if(attachments && attachments.classList.contains("dontDisplay")) attachments.classList.remove("dontDisplay");
         else if(attachments) attachments.classList.add("dontDisplay");
     }
+    const handleReplyAll = async(e) => {
+        e.preventDefault();  
+        await setEmailComposeModalIsVisible(true); 
+        await setIsReply(true);
+    }
     return(
         <div id="email-content" style={{width: "50%"}}className="emailContent">
             <div class="emailHeader flex">
@@ -81,7 +86,7 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
             </div>
             <div className="emailMetaData normalFont"> 
                 <div style={{maxWidth: "80%"}}>Sent to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
-                <div className="replyAll" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}><i class="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
+                <div className="replyAll" onClick={handleReplyAll}><i class="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
             </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
