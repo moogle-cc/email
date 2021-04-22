@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useRef} from 'react';
 import JoditEditor from "jodit-react";
-import { ADDRESS_DELIM } from '../../constants';
+import axios from 'axios';
+import { ADDRESS_DELIM, DEFAULT_FQDN, EMAIL_CONTENT_URL } from '../../constants';
 
 const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, emailComposeModalIsVisible, isReply}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
       toEmail: undefined,
       ccEmail: undefined,
-      sender: `${JSON.parse(atob(JSON.parse(localStorage.userDetails).id_token.split('.')[1]))["cognito:username"]}@moogle.cc`,
+      sender: localStorage.userDetails ? `${JSON.parse(atob(JSON.parse(localStorage.userDetails).id_token.split('.')[1]))["cognito:username"]}@moogle.cc`: undefined,
       emailSubject: undefined,
     });
     const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
@@ -33,7 +34,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
         duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
         tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
         tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
-        await setSendEmailDetails({ ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
+        await setSendEmailDetails({ ...sendEmailDetails, ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
       }
     };
     const clearEmailDestinations= async ()=>{
@@ -77,7 +78,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
       showCharsCounter: false,
       showWordsCounter: false,
     }
-    const sendEmail = (e) => {
+    const sendEmail = async (e) => {
       e.preventDefault();
       if(sendEmailDetails.toEmail && sendEmailDetails.sender){
           let toEmail = sendEmailDetails.toEmail || [];
@@ -98,23 +99,29 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
           console.log(body)
           setEmailSendStatus('success')
           setEmailSendStatusMessage('Sending...');
-          // await ses.sendEmail(params).promise()
-          // .then(r => {
-          //   setEmailSendStatus('success'); 
-          //   setEmailSendStatusMessage('Mail sent!');
-          // })
-          // .catch(e => {
-          //   console.log(e);
-          //   let tempEmailSendStatus = 'failed';
-          //   let tempEmailSendStatusMessage = 'Mail could not be sent';
-          //   if(e.message.indexOf('not authorized') > -1) tempEmailSendStatusMessage += ". Check your AWS permissions.";
-          //   else tempEmailSendStatusMessage += '<br>' + e.message;
-          //   setEmailSendStatus(tempEmailSendStatus);
-          //   setEmailSendStatusMessage(tempEmailSendStatusMessage);
-          // })
-          // .finally(() => {
-          //   setEmailComposeModalIsVisible(true);
-          // })
+          await axios({
+            url: `${EMAIL_CONTENT_URL}?domain=${DEFAULT_FQDN}`,
+            headers: {'Authorization': JSON.parse(localStorage.userDetails).id_token},
+            method: 'POST',
+            data: body
+          })
+          .then( (response) => {
+            console.log(response.data);
+            setEmailSendStatus('success'); 
+            setEmailSendStatusMessage('Mail sent!');
+          })
+          .catch(e => {
+            console.log(e);
+            let tempEmailSendStatus = 'failed';
+            let tempEmailSendStatusMessage = 'Mail could not be sent';
+            if(e.message.indexOf('not authorized') > -1) tempEmailSendStatusMessage += ". Check your AWS permissions.";
+            else tempEmailSendStatusMessage += '<br>' + e.message;
+            setEmailSendStatus(tempEmailSendStatus);
+            setEmailSendStatusMessage(tempEmailSendStatusMessage);
+          }).finally(async () => {
+            await setEmailComposeModalIsVisible(false);
+            await setSendEmailDetails({sender: getFromEmail(), ccEmail: "", emailSubject: "", toEmail: ""});
+          })
         } else {
           let tempEmailSendStatus = 'failed';
           let tempEmailSendStatusMessage = `${!sendEmailDetails.toEmail? (!sendEmailDetails.fromEmail ? "TO: and FROM:":"TO:") : (!sendEmailDetails.fromEmail ? "FROM:":"")} Missing`;
