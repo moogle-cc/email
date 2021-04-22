@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import JoditEditor from "jodit-react";
-import {ADDRESS_DELIM, DEFAULT_FQDN } from '../../constants';
+import { ADDRESS_DELIM } from '../../constants';
 
 const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emailList, ses, emailComposeModalIsVisible}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
@@ -26,7 +26,8 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
         let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
         let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
         let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
-        let tempFromEmail = getFromEmail(emailList.currentEmail.emailContent);
+        let tempFromEmail = getFromEmail();
+        console.log(tempToEmail, tempCcEmail);
         if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
         if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
         let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
@@ -40,21 +41,20 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible,  deviceIsMobile, emai
       setSendEmailDetails({sender: undefined, ccEmail: undefined, fromEmail: undefined, emailSubject: undefined, toEmail: undefined})
     };
     const getToEmail = (emailContent) => {
-      let email = [];
-      if(emailContent.from)
-        emailContent.from.value.forEach(value => email.push(value.address)) 
+      let email =[];
+      if(emailContent && emailContent.from){
+        emailContent.from.value.forEach(value => email.push(value.address));
+      }
       return email;
     }
 
-    const getFromEmail = (emailContent) => {
-      let email =[];
-      if(emailContent.to)
-        emailContent.to.value.forEach(value => {if(value.address.split("@")[1] === DEFAULT_FQDN) email.push(value.address)})
-      return email;
+    const getFromEmail = () => {
+      let idToken = JSON.parse(localStorage.userDetails).id_token;
+      return JSON.parse(atob(idToken.split('.')[1])).email;
     }
     const getCcEmail = (emailContent) => {
       let email =[];
-      if(emailContent.cc){
+      if(emailContent && emailContent.cc){
         emailContent.cc.value.forEach(value => email.push(value.address));
       }
       return email;
