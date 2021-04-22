@@ -6,7 +6,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
     const [sendEmailDetails, setSendEmailDetails] = useState({
       toEmail: undefined,
       ccEmail: undefined,
-      sender: undefined,
+      sender: `${JSON.parse(atob(JSON.parse(localStorage.userDetails).id_token.split('.')[1]))["cognito:username"]}@moogle.cc`,
       emailSubject: undefined,
     });
     const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
@@ -26,18 +26,18 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
         let tempEmailSubject = emailList.currentEmail.emailContent.subject || "(no subject)";
         let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
         let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
-        let tempFromEmail = getFromEmail();
+        let tempFromEmail = sendEmailDetails.sender;
         if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
         if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
         let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
         duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
         tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
         tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
-        await setSendEmailDetails({sender: tempFromEmail, ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
+        await setSendEmailDetails({ ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
       }
     };
     const clearEmailDestinations= async ()=>{
-      await setSendEmailDetails({sender: "", ccEmail: "", emailSubject: "", toEmail: ""})
+      await setSendEmailDetails({sender: getFromEmail(), ccEmail: "", emailSubject: "", toEmail: ""})
     };
     const getToEmail = (emailContent) => {
       let email =[];
@@ -51,7 +51,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
 
     const getFromEmail = () => {
       let idToken = JSON.parse(localStorage.userDetails).id_token;
-      return JSON.parse(atob(idToken.split('.')[1])).email;
+      return `${JSON.parse(atob(idToken.split('.')[1]))["cognito:username"]}@moogle.cc`
     }
     const getCcEmail = (emailContent) => {
       let email =[];
