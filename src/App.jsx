@@ -58,6 +58,7 @@ const App = (props) => {
         myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => {clearInterval(interval)};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buckets]);
 
   useEffect(() => {
@@ -289,14 +290,14 @@ const App = (props) => {
   return (
     
     <div className="mainEmailContainer" style={{height: "100vh"}}>
-      <SideBar buckets={buckets} setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} setEmailList={setEmailList} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
           <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
           {
             emailList.currentEmail ? 
-                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
+                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible}/> 
             : null
           }
         </div>

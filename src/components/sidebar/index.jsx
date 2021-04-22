@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import "./sidebar.css"
 
-const SideBar = ({buckets, setEmailList}) => {
+const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible}) => {
     
     useEffect(() => {
         if(buckets)
@@ -52,8 +52,8 @@ const SideBar = ({buckets, setEmailList}) => {
                     :'Retrieving....'
                 }                
             </ul>
-            <button className="editorBtn">
-                <i className="fa fa-pencil"></i>
+            <button className="editorBtn" onClick={() => setEmailComposeModalIsVisible(true)}>
+                <i className="fa fa-pencil" ></i>
             </button>
         </div>
     )

@@ -25,6 +25,7 @@ h1{
 .justify-between{justify-content: space-between;}
 .justify-center{justify-content: center;}
 .align-center{align-items: center;}
+.justify-around{justify-content: space-around;}
 .left-panel{
     width: 20vw;
     height: 100vh;
@@ -116,4 +117,7 @@ h1{
 .email img{
     width: 45px;
     height: 50px;
+}
+.sendEmailMetadataContainer .field{
+    width: 22vw;
 }
