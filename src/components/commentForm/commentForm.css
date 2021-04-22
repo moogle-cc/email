@@ -23,7 +23,7 @@ input:focus, textarea:focus, select:focus{
     border: none;
     margin: 15px;
 }
-.control{
+.commentForm .control{
     border-radius: 20px;
     box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.4)
 }

@@ -5,7 +5,7 @@ import axios from 'axios';
 import moment from 'moment';
 import "./emailContent.css";
 
-const EmailContent = ({emailList, COMMENT_POST_URL}) => {
+const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisible}) => {
     const [commentArray, setCommentArray] = useState([]);
     useEffect(() => {
         if(emailList.currentEmailId)
@@ -81,7 +81,7 @@ const EmailContent = ({emailList, COMMENT_POST_URL}) => {
             </div>
             <div className="emailMetaData normalFont"> 
                 <div style={{maxWidth: "80%"}}>Sent to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
-                <div style={{marginLeft: "auto"}}>Size: {emailList.currentEmail.Size} bytes</div>
+                <div className="replyAll" onClick={(e) => {e.preventDefault(); setEmailComposeModalIsVisible(true)}}><i class="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
             </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 

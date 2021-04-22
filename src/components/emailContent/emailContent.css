@@ -17,6 +17,15 @@
   display: flex;
   align-items: center;
 }
+.replyAll{
+  cursor: pointer;
+  margin-left: auto;
+}
+.replyAll i:hover{
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #003862;
+  color: transparent;
+}
 .attachmentIcon{
   padding: 0.9em 0.5em 0 1em;
   cursor: pointer;

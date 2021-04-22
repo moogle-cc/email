@@ -11,9 +11,8 @@ import EmailComposeModal from './components/emailComposeModal';
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import './App.css';
 import SideBar from './components/sidebar';
-import {ADDRESS_DELIM, DEFAULT_FQDN, COGNITO_LOGIN_URL, 
-  EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, COMMENT_POST_URL, HOST, 
-  EMAIL_CONTENT_URL} from './constants';
+import {DEFAULT_FQDN, COGNITO_LOGIN_URL, EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, 
+  COMMENT_POST_URL, EMAIL_CONTENT_URL} from './constants';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
@@ -58,6 +57,7 @@ const App = (props) => {
         myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => {clearInterval(interval)};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buckets]);
 
   useEffect(() => {
@@ -289,14 +289,14 @@ const App = (props) => {
   return (
     
     <div className="mainEmailContainer" style={{height: "100vh"}}>
-      <SideBar buckets={buckets} setEmailList={setEmailList}/>
+      <SideBar buckets={buckets} setEmailList={setEmailList} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible}/>
       <div class="emailContainer">
         <Navbar getEmails={getEmails} authTokenIsValid={authTokenIsValid}  />
         <div style={{display: "flex"}}>
           <EmailList emailList={emailList} fqdn={fqdn} setEmailList={setEmailList}/>
           {
             emailList.currentEmail ? 
-                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL}/> 
+                <EmailContent emailList={emailList} COMMENT_POST_URL={COMMENT_POST_URL} setEmailComposeModalIsVisible={setEmailComposeModalIsVisible}/> 
             : null
           }
         </div>
@@ -318,8 +318,8 @@ const App = (props) => {
         deviceIsMobile={deviceIsMobile} keys={keys} setKeys={setKeys} sesRegions={sesRegions} 
         setDataMustBeSavedLocally={setDataMustBeSavedLocally} />
 
-      <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} HOST={HOST} emailList={emailList}
-        deviceIsMobile={deviceIsMobile} ADDRESS_DELIM={ADDRESS_DELIM} ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
+      <EmailComposeModal setEmailComposeModalIsVisible={setEmailComposeModalIsVisible} emailList={emailList}
+        deviceIsMobile={deviceIsMobile}  ses={ses} emailComposeModalIsVisible={emailComposeModalIsVisible}/>
     </div>
   )
 }
