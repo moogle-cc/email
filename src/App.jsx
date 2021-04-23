@@ -146,7 +146,10 @@ const App = (props) => {
         access_token: params.get('access_token'),
       }
       localStorage.setItem("userDetails" ,JSON.stringify(temp));
-      setAuthDetails(temp)
+      setAuthDetails(temp);
+      let href = window.location.href;
+      let newUrl = href.substring(0, href.indexOf('#'));
+      window.history.replaceState({}, '', newUrl);
     }else{ 
       localStorage.removeItem("userDetails") 
       redirectToLogin();
