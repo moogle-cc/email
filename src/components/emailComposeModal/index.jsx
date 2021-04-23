@@ -3,17 +3,25 @@ import JoditEditor from "jodit-react";
 import axios from 'axios';
 import { ADDRESS_DELIM, DEFAULT_FQDN, EMAIL_CONTENT_URL } from '../../constants';
 
-const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, emailComposeModalIsVisible, isReply}) => {
+const getFromEmail = () => {
+  let idToken = JSON.parse(localStorage.userDetails).id_token;
+  let username = JSON.parse(atob(idToken.split('.')[1]))["cognito:username"];
+  let email = JSON.parse(atob(idToken.split('.')[1])).email.split("@")[0];
+  if(username)
+    return `${username}@${DEFAULT_FQDN}`;
+  return `${email}@${DEFAULT_FQDN}`
+}
+
+const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailComposeModalIsVisible, isReply}) => {
     const [sendEmailDetails, setSendEmailDetails] = useState({
-      toEmail: undefined,
-      ccEmail: undefined,
-      sender: localStorage.userDetails ? `${JSON.parse(atob(JSON.parse(localStorage.userDetails).id_token.split('.')[1]))["cognito:username"]}@moogle.cc`: undefined,
-      emailSubject: undefined,
+      toEmail: "",
+      ccEmail: "",
+      sender: localStorage.userDetails ? getFromEmail() : "",
+      emailSubject: "",
     });
     const [htmlEmailContent, setHtmlEmailContent]= useState(undefined);
     const [emailSendStatus, setEmailSendStatus] = useState(undefined);
     const [emailSendStatusMessage, setEmailSendStatusMessage]= useState(undefined);
-    console.log(sendEmailDetails)
     useEffect(() => {
       if(emailList.currentEmail){
         clearEmailDestinations();
@@ -50,14 +58,6 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
       return email;
     }
 
-    const getFromEmail = () => {
-      let idToken = JSON.parse(localStorage.userDetails).id_token;
-      let username = JSON.parse(atob(idToken.split('.')[1]))["cognito:username"];
-      let email = JSON.parse(atob(idToken.split('.')[1])).email.split("@")[0];
-      if(username)
-        return `${username}@moogle.cc`;
-      return `${email}@moogle.cc`
-    }
     const getCcEmail = (emailContent) => {
       let email =[];
       if(emailContent && emailContent.cc){
@@ -100,7 +100,6 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
             text_part: document.getElementById("editor").innerText,
             html_part: htmlEmailContent,
           };
-          console.log(body)
           setEmailSendStatus('success')
           setEmailSendStatusMessage('Sending...');
           await axios({
@@ -110,7 +109,6 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
             data: body
           })
           .then( (response) => {
-            console.log(response.data);
             setEmailSendStatus('success'); 
             setEmailSendStatusMessage('Mail sent!');
           })
@@ -125,6 +123,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, ses, email
           }).finally(async () => {
             await setEmailComposeModalIsVisible(false);
             await setSendEmailDetails({sender: getFromEmail(), ccEmail: "", emailSubject: "", toEmail: ""});
+            setHtmlEmailContent("")
           })
         } else {
           let tempEmailSendStatus = 'failed';
