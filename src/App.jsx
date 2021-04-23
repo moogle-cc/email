@@ -77,7 +77,6 @@ const App = (props) => {
     // setSesRegions(tempSesRegions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     if(authDetails){
       getEmails();
@@ -210,7 +209,7 @@ const App = (props) => {
     emailSet.forEach((email) => {
       email.emailContent.to.value.forEach(sentTo => {
         if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
-          let name = sentTo.name.length>0 ? sentTo.name : sentTo.address.split("@")[0];
+          let name = sentTo.address.split("@")[0];
           let newBucket = name.toLowerCase();
           let found = buckets.some(buck => buck.name === newBucket);
           if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
