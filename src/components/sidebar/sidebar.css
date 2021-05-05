@@ -1,9 +1,41 @@
+.left-panel{
+    width: 20vw;
+    height: 100vh;
+
+    background-color: #DFF1F1;
+    position: fixed;
+}
+.moogle-logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 18vh;
+    /* margin: 0 auto 60px auto; */
+}
+.moogle-logo img{
+    margin: auto 10%;
+    width: 50%;
+}
+
+.editorBtn{
+    outline: none;
+    border: none;
+    padding: 15px 18px;
+    color: #fff;
+    border-radius: 50%;
+    background: #FF8B88;
+    position: absolute;
+    bottom: 10vh;
+    left: 5vh;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
 .selectedBucket{
     box-shadow: 0 0 5px rgba(0,0,0,0.4);
     background-color:white;
     width:100%;
     border-radius: 0;
-    display: flex;
 }
 .selectedBucket .bucketEmailCount{
     color: white;
@@ -20,7 +52,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 50px;
+    height: 50px;
+    width: 50px;
     border: 2px solid #003862;
     border-radius: 50%;
     font-weight: 500;

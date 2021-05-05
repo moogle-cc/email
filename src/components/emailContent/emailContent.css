@@ -1,6 +1,6 @@
 .emailContent{
     /* animation: fadeIn 1s; */
-    box-shadow: -10px -2px 5px rgba(0,0,0,0.2);
+    box-shadow: -10px -2px 20px rgba(0,0,0,0.2);
     margin: 0 0 0 1vh;
     padding: 0 0 3vh 0;
 }
@@ -16,10 +16,15 @@
   margin-left: auto;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width:18%;
 }
 .replyAll{
   cursor: pointer;
-  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5em;
 }
 .replyAll i:hover{
   -webkit-text-stroke-width: 1px;
@@ -27,8 +32,11 @@
   color: transparent;
 }
 .attachmentIcon{
-  padding: 0.9em 0.5em 0 1em;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5em;
 }
 .attachmentsContainer{
   padding: 1em 1em;
@@ -50,6 +58,7 @@
   overflow-x:hidden;
   overflow-y: hidden;
   width:100%;
+  height: 75vh;
 }
 .smallFrame{
   height: 34em;
@@ -84,28 +93,31 @@
 .showingComments span{
   color: #003862;
 }
+.fa-comments{
+  font-size: 2.5em;
+}
 
 @keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-  }
-  
-  @-moz-keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-  }
-  
-  @-webkit-keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-  }
-  
-  @-o-keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-  }
-  
-  @-ms-keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-  }
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
