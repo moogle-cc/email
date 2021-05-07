@@ -69,24 +69,26 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
     }
     return(
         <div id="email-content" style={{width: "50%"}}className="emailContent">
-            <div class="emailHeader flex">
+            <div className="emailHeader flex">
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
-                <h3 class="flex  align-center" style={{width: "86%"}}> 
+                <h3 className="flex  align-center" style={{width: "86%"}}> 
                     <span> {emailList.currentEmail.emailContent.subject}</span>
-                    <span className="normalFont" style={{marginLeft: "auto"}}>{moment(emailList.currentEmail.emailContent.date).format("DD/MM/YYYY")}</span>
+                    <span className="normalFont" style={{marginLeft: "auto", color:"#3f3f3f"}}>{moment(emailList.currentEmail.emailContent.date).format("DD/MM/YYYY")}</span>
                 </h3>
                 
-                <div className="icons">
-                    <div className="attachmentIcon" onClick={handleShowAttachments}><i class="fa fa-paperclip fa-2x" aria-hidden="true"></i></div>
-                    <div className="commentIcon" onClick={handlShowComments}>
-                        <i class="fa fa-comments fa-3x" aria-hidden="true"></i>
-                        <span>{commentArray.length}</span>
-                    </div>
-                </div>
+                
             </div>
             <div className="emailMetaData normalFont"> 
                 <div style={{maxWidth: "80%"}}>Sent to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
-                <div className="replyAll" onClick={handleReplyAll}><i class="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
+                <div className="icons">
+                    <div className="attachmentIcon" onClick={handleShowAttachments}><i className="fa fa-paperclip fa-2x" aria-hidden="true"></i></div>
+                    <div className="replyAll" onClick={handleReplyAll}><i className="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
+                    <div className="commentIcon" onClick={handlShowComments}>
+                        <i className="fa fa-comments" aria-hidden="true"></i>
+                        <span>{commentArray.length}</span>
+                    </div>
+                </div>
+                
             </div>
             {
                 !iframeSrc() ? <span className="has-text-weight-light">{ emailList.statusMsg }</span> 
