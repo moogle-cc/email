@@ -1,4 +1,5 @@
 import React from 'react'; 
+import "./navbar.css";
 
 const Navbar = ({getEmails, authTokenIsValid}) => {
     const getUsername = () => {
@@ -13,12 +14,12 @@ const Navbar = ({getEmails, authTokenIsValid}) => {
       <div>
         {
           authTokenIsValid() ?
-          <div class="emailContainerHeader flex justify-between">
-            <input type="text" class="emailSearch" placeholder="&#xF002;  Search" />
-            <div class="headerRightElements flex">
-                <div class="refreshBtn element flex justify-center align-center" onClick={(e) =>{e.preventDefault(); getEmails()}}> <span>&#xf021;</span> </div>
+          <div className="emailContainerHeader flex justify-between">
+            <input type="text" className="emailSearch" placeholder="&#xF002;  Search" />
+            <div className="headerRightElements flex">
+                <div className="refreshBtn element flex justify-center align-center" onClick={(e) =>{e.preventDefault(); getEmails()}}> <span>&#xf021;</span> </div>
                 <span className="newEmailHighlighter"></span>
-                <div class="userAvatar element flex justify-center align-center"> <span> {getUsername()} </span> </div>
+                <div className="userAvatar element flex justify-center align-center"> <span> {getUsername()} </span> </div>
             </div>
           </div>
           :null

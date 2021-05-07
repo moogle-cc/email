@@ -17,7 +17,9 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
         if(tempcurrentEmail.emailContent.html) tempemailContent = tempcurrentEmail.emailContent.html;
         else if(tempcurrentEmail.emailContent.textAsHtml) tempemailContent = tempcurrentEmail.emailContent.textAsHtml;
       }
-      if(emailList.currentEmail === tempcurrentEmail)setEmailList({...emailList, emailContent: undefined, currentEmail: undefined, currentEmailId: undefined})
+      if(emailList.currentEmail === tempcurrentEmail){
+        setEmailList({...emailList, emailContent: undefined, currentEmail: undefined, currentEmailId: undefined})
+      }
       else if(tempcurrentEmailId) setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail, currentEmailId: tempcurrentEmailId});
       else setEmailList({...emailList, emailContent: tempemailContent, currentEmail: tempcurrentEmail});
       let emailReadStatus = JSON.parse(localStorage.emailReadStatus);
@@ -38,12 +40,18 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
     }
     
     const selectEmail = (idx) => {
-      if(buckets){
-        const noOfEmails = document.querySelectorAll('[idx]');
+      if(idx){
+        const noOfEmails = document.querySelectorAll('[id]');
+        const selectedEmail = document.getElementById(idx);
         noOfEmails.forEach((data) => {
-          if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
-          document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
+          if(data.classList.contains('selectedEmail') && data !== selectedEmail) data.classList.remove('selectedEmail')
         });
+        if(!selectedEmail.classList.contains("selectedEmail")){
+          document.querySelector('[id="'+idx+'"]').classList.add('selectedEmail');
+        }else{
+          document.querySelector('[id="'+idx+'"]').classList.remove('selectedEmail');
+        }
+          
         return true;
       }
     }
@@ -59,7 +67,7 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
                 {
                   emailList.emailSet ?
                   emailList.emailSet.map((email, idx)=> (
-                    <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={(e) =>{e.preventDefault(); selectEmail(email.Key); showEmail(email.Key)}}>
+                    <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={email.Key} onClick={async (e) =>{e.preventDefault(); selectEmail(email.Key); await showEmail(email.Key)}}>
                       {
                         email.emailContent ? 
                           <div className= "email flex ">

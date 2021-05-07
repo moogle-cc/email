@@ -1,6 +1,6 @@
 .emailContent{
     /* animation: fadeIn 1s; */
-    box-shadow: -10px -2px 20px rgba(0,0,0,0.2);
+    box-shadow: -10px -2px 20px rgba(0,0,0,0.15);
     margin: 0 0 0 1vh;
     padding: 0 0 3vh 0;
 }

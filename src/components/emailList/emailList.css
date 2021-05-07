@@ -27,7 +27,7 @@
     overflow: hidden;
 }
 .emailDatePreview{
-    color: #003862;
+    color: #3F3F3F;
     font-weight: 430;
     margin-left: auto;
 }
@@ -37,7 +37,8 @@
     margin: auto 0;
 }
 .selectedEmail{
-    box-shadow: 0 0 5px rgba(0,0,0,0.4);
-    border-radius: 20px;
-    width:98%;
+    box-shadow: 0 0 16px rgba(0,0,0,0.4);
+    border-radius: 11px;
+    padding: 0.5% 1%;
+    /* width:98%; */
 }
