@@ -16,6 +16,9 @@
 }
 .emailLists{
     padding: 20px 30px 0 30px;
+    overflow-y: scroll;
+    max-height: 100vh;
+    min-height: 20vh;
 }
 .emailUesrname{
     width: 225px;
