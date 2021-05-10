@@ -30,7 +30,6 @@ h1{
 .emailContainer{
     max-height: 100vh !important;
     margin-left: 20vw;
-    overflow: hidden;
 }
 
 #newEmail{

@@ -4,6 +4,7 @@ import './emailList.css';
 
 const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
     useEffect(() => {
+      clearSelectedEmail();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [emailList.emailSet]);
 
@@ -51,9 +52,14 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
         }else{
           document.querySelector('[id="'+idx+'"]').classList.remove('selectedEmail');
         }
-          
         return true;
       }
+    }
+    const clearSelectedEmail = ()  => {
+      const noOfEmails = document.querySelectorAll('[id]');
+      noOfEmails.forEach((data) => {
+        if(data.classList.contains('selectedEmail')) data.classList.remove('selectedEmail')
+      });
     }
     let selectedBucket = document.getElementsByClassName("selectedBucket")[0];
     let selectedBucketId = selectedBucket ? selectedBucket.id : 0;
@@ -63,7 +69,7 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
                 <h1 class="flex justify-center align-center"> <span style={{textTransform: "capitalize"}}> {buckets ? buckets[selectedBucketId].name : "All"} </span></h1>
             </div>
-            <ul class="emailLists" style={{overflowY: "scroll", maxHeight: "80vh"}}>
+            <ul class="emailLists" >
                 {
                   emailList.emailSet ?
                   emailList.emailSet.map((email, idx)=> (
