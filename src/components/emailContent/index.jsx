@@ -82,9 +82,9 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
                 <div style={{maxWidth: "80%"}}>Sent to: {emailList.currentEmail.emailContent.to.value.map(sent => `${sent.address}`).join(", ")}</div>
                 <div className="icons">
                     <div className="attachmentIcon" onClick={handleShowAttachments}><i className="fa fa-paperclip fa-2x" aria-hidden="true"></i></div>
-                    <div className="replyAll" onClick={handleReplyAll}><i className="fa fa-reply-all fa-2x" aria-hidden="true"></i></div>
+                    <div className="replyAll" onClick={handleReplyAll}><i class="fa fa-reply fa-2x"></i> </div>
                     <div className="commentIcon" onClick={handlShowComments}>
-                        <i className="fa fa-comments" aria-hidden="true"></i>
+                        <i class="fa fa-comment fa-2x"></i>
                         <span>{commentArray.length}</span>
                     </div>
                 </div>

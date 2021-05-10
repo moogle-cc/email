@@ -77,9 +77,8 @@
 }
 .commentIcon span{
   position: relative;
-  right: 57%;
+  right: 50%;
   color: white;
-  bottom: 0.2em;
 }
 
 .isInvisible{
@@ -93,7 +92,7 @@
 .showingComments span{
   color: #003862;
 }
-.fa-comments{
+.fa-comment{
   font-size: 2.5em;
 }
 
