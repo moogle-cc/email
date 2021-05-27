@@ -73,7 +73,7 @@ const EmailContent = ({emailList, COMMENT_POST_URL, setEmailComposeModalIsVisibl
                 <img src="https://moogle.cc/media/moogle-comment-share.png" alt="email"/>
                 <h3 className="flex  align-center" style={{width: "86%"}}> 
                     <span> {emailList.currentEmail.emailContent.subject}</span>
-                    <span className="normalFont" style={{marginLeft: "auto", color:"#3f3f3f"}}>{moment(emailList.currentEmail.emailContent.date).format("DD/MM/YYYY")}</span>
+                    <span className="smallFont" style={{marginLeft: "auto", color:"#3f3f3f"}}>{moment(emailList.currentEmail.emailContent.date).format("DD/MM/YYYY hh:mm:ss")}</span>
                 </h3>
                 
                 

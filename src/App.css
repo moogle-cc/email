@@ -46,6 +46,11 @@ h1{
     font-weight: 300 !important;
 }
 
+.smallFont{
+    font-size: 0.875rem;
+    font-weight: 300 !important;
+}
+
 .email{
     padding: 3px 0;
 }
