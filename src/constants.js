@@ -17,4 +17,4 @@ export const SCOPE = 'email+openid';
 export const NEW_EMAIL_CHECKOUT_TIME = 300000;
 export const COGNITO_LOGIN_URL = `${COGNITO_URL}/login?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${LOGIN_REDIRECT_URL}`;
 export const EMAIL_FOLDERPATH_QP_STRING = `folderpath=/email`;
-export const BCC_EMAIL = `secret-bcc-sent-folder@{DEFAULT_FQDN}`;
+export const BCC_EMAIL = `secret-bcc-sent-folder@${DEFAULT_FQDN}`;
