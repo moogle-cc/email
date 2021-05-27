@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import JoditEditor from "jodit-react";
 import axios from 'axios';
-import { ADDRESS_DELIM, DEFAULT_FQDN, EMAIL_CONTENT_URL } from '../../constants';
+import { ADDRESS_DELIM, DEFAULT_FQDN, EMAIL_CONTENT_URL, BCC_EMAIL } from '../../constants';
 
 const getFromEmail = () => {
   let idToken = JSON.parse(localStorage.userDetails).id_token;
@@ -94,6 +94,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
           var body = {
             to: toEmail,
             cc: ccEmail,
+            bcc: [BCC_EMAIL],
             from_email: sendEmailDetails.sender,
             from_name: sendEmailDetails.sender.split("@")[0],
             subject: sendEmailDetails.emailSubject,
