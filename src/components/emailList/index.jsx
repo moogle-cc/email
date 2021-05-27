@@ -80,7 +80,7 @@ const EmailList = ({emailList, buckets, fqdn, setEmailList}) => {
                             <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
                             <h3 className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailUesrname": "emailUesrname"}>{ splitName(email.emailContent.from.text) }</h3>
                             <p className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailTextPreview": "emailTextPreview"}>{ email.emailContent.subject ? `${email.emailContent.subject.slice(0, 60)}...` : "(no subject)"}</p>
-                            <div className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "normalFont emailDatePreview": "emailDatePreview"}>{moment(email.emailContent.date).format('DD/MM/YYYY')}</div>
+                            <div className={JSON.parse(localStorage.emailReadStatus).find(readEmail => readEmail.Key === email.Key && readEmail.readStatus)? "smallFont emailDatePreview": "emailDatePreview"}>{moment(email.emailContent.date).format('DD/MM/YYYY hh:mm:ss')}</div>
                           </div>
                         : null
                       }

@@ -207,20 +207,22 @@ const App = (props) => {
   const makeBuckets = (emailSet) => {
     let buckets = [{name: "spam", emailSet: []}];
     emailSet.forEach((email) => {
-      if(email && email.emailContent && email.emailContent.to && email.emailContent.to.value){
-        email.emailContent.to.value.forEach(sentTo => {
+      if(email && email.emailContent){
+        let emailSentToCc = [];
+        if(email.emailContent.to && email.emailContent.to.value) emailSentToCc.push(...email.emailContent.to.value);
+        if(email.emailContent.cc && email.emailContent.cc.value) emailSentToCc.push(...email.emailContent.cc.value);
+        emailSentToCc.forEach(sentTo => {
           if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
             let name = sentTo.address.split("@")[0];
             let newBucket = name.toLowerCase();
-            let found = buckets.some(buck => buck.name === newBucket);
-            if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
+            let foundIndex = buckets.findIndex(buck => buck.name === newBucket);
+            if(emailIsSpamOrVirus(email)){
               buckets[0].emailSet.push(email);
             }
-            else if(found){
-                let index = buckets.findIndex(buck => buck.name === newBucket);
-                buckets[index].emailSet.push(email)
+            else if(foundIndex > -1){
+                buckets[foundIndex].emailSet.push(email)
             }else{
-                buckets.push({name: newBucket, emailSet: [email]});
+              buckets.push({name: newBucket, emailSet: [email]});
             }
           }
         });
@@ -230,9 +232,12 @@ const App = (props) => {
     let spam = buckets.shift();
     buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
     buckets.push(spam)
-    buckets.unshift({name: "All", emailSet: emailSet})
+    buckets.unshift({name: "All", emailSet: emailSetWithoutSpamOrVirus(emailSet)})
     return buckets;
   }
+  const emailIsSpamOrVirus = (email) => email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS";
+  const emailSetWithoutSpamOrVirus = (emailSet) => emailSet.filter((email) => !emailIsSpamOrVirus(email));
+  
   const assignReadUnread = (emailSet) => {
     let emailReadStatus = []
     if(!localStorage.emailReadStatus){
