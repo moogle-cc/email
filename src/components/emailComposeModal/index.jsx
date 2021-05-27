@@ -111,20 +111,19 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
           .then( (response) => {
             setEmailSendStatus('success'); 
             setEmailSendStatusMessage('Mail sent!');
+            setEmailComposeModalIsVisible(false);
+            setSendEmailDetails({sender: getFromEmail(), ccEmail: "", emailSubject: "", toEmail: ""});
+            setHtmlEmailContent("");
           })
           .catch(e => {
             console.log(e);
             let tempEmailSendStatus = 'failed';
             let tempEmailSendStatusMessage = 'Mail could not be sent';
             if(e.message.indexOf('not authorized') > -1) tempEmailSendStatusMessage += ". Check your AWS permissions.";
-            else tempEmailSendStatusMessage += '<br>' + e.message;
+            else tempEmailSendStatusMessage += '(' + e.message + ')';
             setEmailSendStatus(tempEmailSendStatus);
             setEmailSendStatusMessage(tempEmailSendStatusMessage);
-          }).finally(async () => {
-            await setEmailComposeModalIsVisible(false);
-            await setSendEmailDetails({sender: getFromEmail(), ccEmail: "", emailSubject: "", toEmail: ""});
-            setHtmlEmailContent("")
-          })
+          });
         } else {
           let tempEmailSendStatus = 'failed';
           let tempEmailSendStatusMessage = `${!sendEmailDetails.toEmail? (!sendEmailDetails.fromEmail ? "TO: and FROM:":"TO:") : (!sendEmailDetails.fromEmail ? "FROM:":"")} Missing`;
