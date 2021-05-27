@@ -12,7 +12,7 @@ import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no
 import './App.css';
 import SideBar from './components/sidebar';
 import {DEFAULT_FQDN, COGNITO_LOGIN_URL, EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, 
-  COMMENT_POST_URL, EMAIL_CONTENT_URL} from './constants';
+  COMMENT_POST_URL, EMAIL_CONTENT_URL, EMAIL_FOLDERPATH_QP_STRING} from './constants';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
@@ -53,7 +53,7 @@ const App = (props) => {
   useEffect(() => {
     let interval = setInterval(async () => {
       if(buckets[0].emailSet)
-        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet});
+        myWorker.fetchList({fqdn, authDetails, EMAILS_LIST_URL, emailSet: buckets[0].emailSet, EMAIL_FOLDERPATH_QP_STRING});
     }, NEW_EMAIL_CHECKOUT_TIME);
     return () => {clearInterval(interval)};
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +111,7 @@ const App = (props) => {
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
       await axios({
-        url: `${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,
+        url: `${EMAILS_LIST_URL}?domain=${fqdn}&${EMAIL_FOLDERPATH_QP_STRING}`,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
@@ -207,22 +207,24 @@ const App = (props) => {
   const makeBuckets = (emailSet) => {
     let buckets = [{name: "spam", emailSet: []}];
     emailSet.forEach((email) => {
-      email.emailContent.to.value.forEach(sentTo => {
-        if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
-          let name = sentTo.address.split("@")[0];
-          let newBucket = name.toLowerCase();
-          let found = buckets.some(buck => buck.name === newBucket);
-          if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
-            buckets[0].emailSet.push(email);
+      if(email && email.emailContent && email.emailContent.to && email.emailContent.to.value){
+        email.emailContent.to.value.forEach(sentTo => {
+          if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
+            let name = sentTo.address.split("@")[0];
+            let newBucket = name.toLowerCase();
+            let found = buckets.some(buck => buck.name === newBucket);
+            if(email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS"){
+              buckets[0].emailSet.push(email);
+            }
+            else if(found){
+                let index = buckets.findIndex(buck => buck.name === newBucket);
+                buckets[index].emailSet.push(email)
+            }else{
+                buckets.push({name: newBucket, emailSet: [email]});
+            }
           }
-          else if(found){
-              let index = buckets.findIndex(buck => buck.name === newBucket);
-              buckets[index].emailSet.push(email)
-          }else{
-              buckets.push({name: newBucket, emailSet: [email]});
-          }
-        }
-      });
+        });
+      }
     })
       
     let spam = buckets.shift();

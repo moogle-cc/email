@@ -1,8 +1,8 @@
 const NEW_EMAIL_WAS_FOUND = true;
 
 export const fetchList = async (data) => { // eslint-disable-line no-restricted-globals
-    let {fqdn, authDetails, EMAILS_LIST_URL, emailSet} = data;
-    await fetch(`${EMAILS_LIST_URL}?domain=${fqdn}&folderpath=/email`,{
+    let {fqdn, authDetails, EMAILS_LIST_URL, emailSet, EMAIL_FOLDERPATH_QP_STRING} = data;
+    await fetch(`${EMAILS_LIST_URL}?domain=${fqdn}&${EMAIL_FOLDERPATH_QP_STRING}`,{
       headers: {'Authorization':authDetails.id_token},
     }).then((response)=> response.json())
     .then(async (response) => { 
