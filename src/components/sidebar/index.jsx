@@ -43,7 +43,7 @@ const SideBar = ({buckets, setEmailList, setEmailComposeModalIsVisible, setIsRep
                     buckets ? 
                     buckets.map((bucket,idx) => (
                         <li style={{'cursor': 'pointer'}} key={`email-idx-${idx}`} id={idx} onClick={(e) =>{e.preventDefault(); selectBucket(idx); showBucketEmail(idx)}}>
-                        {idx === buckets.length-1 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0"}}/> : null}
+                        {idx === buckets.length-2 ? <hr style={{backgroundColor: "rgba(0,0,0,0.4)", margin: "0"}}/> : null}
                         {
                             <div className="bucket flex">
                                 <img src="https://telegra.ph/file/01c9dae93673d009e5dde.jpg" alt="telephone"/>
