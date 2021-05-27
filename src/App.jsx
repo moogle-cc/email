@@ -204,40 +204,64 @@ const App = (props) => {
   const redirectToLogin=() =>{
     window.location.href = loginUrl;
   };
+  let getOrCreateBucketByName = (buckets, bucketName) => {
+    let bucket = buckets.find(bucket => bucket.name === bucketName.toLowerCase());
+    if(!bucket) buckets.push({name: bucketName.toLowerCase(), emailSet: []});
+    return buckets.find(bucket => bucket.name === bucketName.toLowerCase());
+  };
+  const getSenderEmail = (email) => email.emailContent.from.value[0].address.toLowerCase();
+  const emailAddressBelongsToThisDomain = (emailAddress) => emailAddress.split("@")[1] === DEFAULT_FQDN;
+  const getIndexOfBucket = (buckets, name) => buckets.findIndex((b) => b.name.toLowerCase() === name.toLowerCase());
+  const moveBucketWithNameToFront = (buckets, name) => {
+    let index = getIndexOfBucket(buckets, name);
+    if(index > -1) {
+      let bucket = buckets.splice(index, 1);
+      buckets.unshift(...bucket);
+    }
+  };
+  const moveBucketWithNameToBack = (buckets, name) => {
+    let index = getIndexOfBucket(buckets, name);
+    if(index > -1) {
+      let bucket = buckets.splice(index, 1);
+      buckets.push(...bucket);
+    }
+  };
+  const sortBuckets = (buckets) => {
+    buckets.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+    moveBucketWithNameToFront(buckets, 'all');
+    moveBucketWithNameToBack(buckets, 'sent');
+    moveBucketWithNameToBack(buckets, 'spam');
+    return buckets;
+  }
   const makeBuckets = (emailSet) => {
-    let buckets = [{name: "spam", emailSet: []}];
+    let buckets = [];
+    getOrCreateBucketByName(buckets, "all");
+    getOrCreateBucketByName(buckets, "spam");
+    getOrCreateBucketByName(buckets, "sent");
     emailSet.forEach((email) => {
       if(email && email.emailContent){
         let emailSentToCc = [];
         if(email.emailContent.to && email.emailContent.to.value) emailSentToCc.push(...email.emailContent.to.value);
         if(email.emailContent.cc && email.emailContent.cc.value) emailSentToCc.push(...email.emailContent.cc.value);
+        let senderEmail = getSenderEmail(email).toLowerCase();
+        if(emailAddressBelongsToThisDomain(senderEmail)) getOrCreateBucketByName(buckets, "sent").emailSet.push(email);
         emailSentToCc.forEach(sentTo => {
-          if(sentTo.address.split("@")[1] === DEFAULT_FQDN){
-            let name = sentTo.address.split("@")[0];
-            let newBucket = name.toLowerCase();
-            let foundIndex = buckets.findIndex(buck => buck.name === newBucket);
-            if(emailIsSpamOrVirus(email)){
-              buckets[0].emailSet.push(email);
-            }
-            else if(foundIndex > -1){
-                buckets[foundIndex].emailSet.push(email)
-            }else{
-              buckets.push({name: newBucket, emailSet: [email]});
+          if(emailAddressBelongsToThisDomain(sentTo.address)){
+            if(emailIsSpamOrVirus(email)) getOrCreateBucketByName(buckets, "spam").emailSet.push(email);
+            else {
+              let name = sentTo.address.split("@")[0];
+              let newBucket = name.toLowerCase();
+              getOrCreateBucketByName(buckets, newBucket).emailSet.push(email);
+              getOrCreateBucketByName(buckets, "all").emailSet.push(email);
             }
           }
         });
       }
-    })
+    });
       
-    let spam = buckets.shift();
-    buckets.sort((a, b) => (a.name > b.name) ? 1 : -1)
-    buckets.push(spam)
-    buckets.unshift({name: "All", emailSet: emailSetWithoutSpamOrVirus(emailSet)})
-    return buckets;
+    return sortBuckets(buckets);
   }
   const emailIsSpamOrVirus = (email) => email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS";
-  const emailSetWithoutSpamOrVirus = (emailSet) => emailSet.filter((email) => !emailIsSpamOrVirus(email));
-  
   const assignReadUnread = (emailSet) => {
     let emailReadStatus = []
     if(!localStorage.emailReadStatus){
