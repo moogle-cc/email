@@ -210,7 +210,7 @@ const App = (props) => {
     return buckets.find(bucket => bucket.name === bucketName.toLowerCase());
   };
   const getSenderEmail = (email) => email.emailContent.from.value[0].address.toLowerCase();
-  const emailAddressBelongsToThisDomain = (emailAddress) => emailAddress.split("@")[1] === DEFAULT_FQDN;
+  const emailAddressBelongsToThisDomain = (emailAddress) => emailAddress && emailAddress.split("@")[1] === DEFAULT_FQDN;
   const getIndexOfBucket = (buckets, name) => buckets.findIndex((b) => b.name.toLowerCase() === name.toLowerCase());
   const moveBucketWithNameToFront = (buckets, name) => {
     let index = getIndexOfBucket(buckets, name);
