@@ -13,6 +13,7 @@ import './App.css';
 import SideBar from './components/sidebar';
 import {DEFAULT_FQDN, COGNITO_LOGIN_URL, EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, 
   COMMENT_POST_URL, EMAIL_CONTENT_URL, EMAIL_FOLDERPATH_QP_STRING} from './constants';
+import {initializeEmailReadStatus, markEmailReadStatus} from './utils.js';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
@@ -43,6 +44,8 @@ const App = (props) => {
     accessKeyId: undefined,
     region: undefined,
   });
+
+  const [emailReadStatus, setEmailReadStatus] = useState(initializeEmailReadStatus());
 
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
@@ -89,6 +92,10 @@ const App = (props) => {
     updateLocalData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keys]); 
+
+  useEffect(() => {
+    localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
+  }, [emailReadStatus]);
 
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
@@ -210,7 +217,7 @@ const App = (props) => {
     return buckets.find(bucket => bucket.name === bucketName.toLowerCase());
   };
   const getSenderEmail = (email) => email.emailContent.from.value[0].address.toLowerCase();
-  const emailAddressBelongsToThisDomain = (emailAddress) => emailAddress.split("@")[1] === DEFAULT_FQDN;
+  const emailAddressBelongsToThisDomain = (emailAddress) => emailAddress && emailAddress.split("@")[1] === DEFAULT_FQDN;
   const getIndexOfBucket = (buckets, name) => buckets.findIndex((b) => b.name.toLowerCase() === name.toLowerCase());
   const moveBucketWithNameToFront = (buckets, name) => {
     let index = getIndexOfBucket(buckets, name);
@@ -263,21 +270,11 @@ const App = (props) => {
   }
   const emailIsSpamOrVirus = (email) => email.emailContent.headers["x-ses-spam-verdict"] !== "PASS" || email.emailContent.headers["x-ses-virus-verdict"] !== "PASS";
   const assignReadUnread = (emailSet) => {
-    let emailReadStatus = []
-    if(!localStorage.emailReadStatus){
-      emailSet.forEach((email) => {
-        emailReadStatus.push({Key: email.Key, readStatus: false});
-      });
-    } else {
-      emailReadStatus = JSON.parse(localStorage.emailReadStatus)
-      let temp = emailReadStatus;
-      let i=0;
-      while(emailSet[i] && temp[0] && emailSet[i].Key !== temp[0].Key){
-        emailReadStatus.unshift({Key: emailSet[i].Key, readStatus: false});
-        i++;
-      }
-    }
-    localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
+    let tempEmailReadStatus = JSON.parse(JSON.stringify(emailReadStatus));
+    emailSet.forEach(email => {
+      markEmailReadStatus(email, tempEmailReadStatus);
+    });
+    setEmailReadStatus(tempEmailReadStatus);
   }
   // const shareableUrl = () => {
   //   return `${ORIGIN}${PATHNAME}/get.html?emailId=${emailList.currentEmailId}`;

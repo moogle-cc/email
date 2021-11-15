@@ -7,7 +7,7 @@ const CommentList = ({commentArray}) => {
     // let comment_html = document.getElementById("comments_html");
     return (
         <div className="commentList">
-            <h3 className="emailUesrname">Your Comments</h3>
+            <h3 className="emailUsername">Your Comments</h3>
             <ul>
             {
                 commentArray ?
