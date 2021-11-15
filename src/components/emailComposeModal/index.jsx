@@ -36,13 +36,18 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
         let tempToEmail = getToEmail(emailList.currentEmail.emailContent);
         let tempCcEmail = getCcEmail(emailList.currentEmail.emailContent);
         let tempFromEmail = sendEmailDetails.sender;
+        let messageId = getOriginalMessageId(emailList.currentEmail.emailContent);
         if(tempToEmail.indexOf(tempFromEmail) > -1) tempToEmail.splice(tempToEmail.indexOf(tempFromEmail), 1);
         if(tempCcEmail.indexOf(tempFromEmail) > -1) tempCcEmail.splice(tempCcEmail.indexOf(tempFromEmail), 1);
         let duplicates = tempToEmail.filter((email) => tempCcEmail.indexOf(email) > -1);
         duplicates.map(d => tempCcEmail.splice(tempCcEmail.indexOf(d), 1));
         tempToEmail = tempToEmail.length > 0 ? tempToEmail.join(ADDRESS_DELIM) : undefined;
         tempCcEmail = tempCcEmail.length > 0 ? tempCcEmail.join(ADDRESS_DELIM) : undefined;
-        await setSendEmailDetails({ ...sendEmailDetails, ccEmail: tempCcEmail, emailSubject: tempEmailSubject, toEmail: tempToEmail})
+        await setSendEmailDetails({ ...sendEmailDetails, 
+            ccEmail: tempCcEmail, 
+            emailSubject: tempEmailSubject, 
+            toEmail: tempToEmail, 
+            references: messageId});
       }
     };
     const clearEmailDestinations= async ()=>{
@@ -65,6 +70,8 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
       }
       return email;
     }
+
+    const getOriginalMessageId = (emailContent) => (emailContent.headers ?? {})["message-id"] ?? undefined;
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -100,6 +107,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
             subject: sendEmailDetails.emailSubject,
             text_part: document.getElementById("editor").innerText,
             html_part: htmlEmailContent,
+            references: sendEmailDetails.references || undefined,
           };
           setEmailSendStatus('success')
           setEmailSendStatusMessage('Sending...');
@@ -146,7 +154,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
                     <div className="field">
                       <div className="control has-icons-left">
                           <input className="input" type="email" placeholder="TO: email1; email2;" value={sendEmailDetails.toEmail} name="toEmail" onChange={handleChange} />
-                          <sub>(Separate multiple TO: emails with semi-colons;)</sub>
+                          <sub>(Separate multiple TO: emails with commas,)</sub>
                           <span className="icon is-small is-left">
                             <i className="fa fa-envelope"></i>
                           </span>
@@ -155,7 +163,7 @@ const EmailComposeModal = ({setEmailComposeModalIsVisible, emailList, emailCompo
                     <div className="field">
                       <div className="control has-icons-left">
                           <input className="input" type="email" placeholder="CC: : email3; email4;" value={sendEmailDetails.ccEmail} name="ccEmail" onChange={handleChange} />
-                          <sub>(Separate multiple CC: emails with semi-colons;)</sub>
+                          <sub>(Separate multiple CC: emails with commas,)</sub>
                           <span className="icon is-small is-left">
                             <i className="fa fa-envelope"></i>
                           </span>
