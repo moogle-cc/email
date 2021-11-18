@@ -2,6 +2,9 @@
 
 The tool acts as a domain level email client for AWS SES and can be used to send and receive emails just like you would with Gmail or Outlook. The app is built using React and styles using custom, handwritten css.
 
+Here's what the inbox looks like live.
+![Moogle Inbox Screenshot](https://github.com/moogle-cc/email/blob/b98a3d192e5cf91f58dffa72a0a7677d030b2fc0/images/Moogle%20Email%20Screenshot.png)
+
 To function correctly, the client relies on three APIs. The APIs are covered in more detail later.
 
 1. `LIST [GET]` - returns a list of the most recent N emails (newest first) received by AWS SES on your domain
