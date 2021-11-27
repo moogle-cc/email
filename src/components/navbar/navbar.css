@@ -33,6 +33,6 @@
 .headerRightElements .refreshBtn{
     font-family: 'Poppins' , FontAwesome;
 }
-.headerRightElements .refreshBtn:hover{
+.headerRightElements .refreshBtn:hover, .headerRightElements .loadMoreBtn:hover{
     background: rgba(0,0,0,0.07);
 }
