@@ -13,7 +13,7 @@ import './App.css';
 import SideBar from './components/sidebar';
 import {DEFAULT_FQDN, COGNITO_LOGIN_URL, EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, 
   COMMENT_POST_URL, EMAIL_CONTENT_URL, EMAIL_FOLDERPATH_QP_STRING} from './constants';
-import {initializeEmailReadStatus, markEmailReadStatus} from './utils.js';
+import {initializeEmailReadStatus, markEmailReadStatus, uniqueify } from './utils.js';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
@@ -46,13 +46,22 @@ const App = (props) => {
   });
 
   const [emailReadStatus, setEmailReadStatus] = useState(initializeEmailReadStatus());
-
+  const [nextToken, setNextToken] = useState(undefined);
+  const [newEmailWasFoundFlag, setNewEmailWasFoundFlag] = useState(false);
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
     if(e.data.NEW_EMAIL_WAS_FOUND){
-      document.getElementsByClassName("newEmailHighlighter")[0].setAttribute('id', 'newEmail')
+      setNewEmailWasFoundFlag(true);
+      //document.getElementsByClassName("newEmailHighlighter")[0].setAttribute('id', 'newEmail');
     }
   });
+  useEffect(() => {
+    let el = document.getElementsByClassName("newEmailHighlighter")[0];
+    if(el) {
+      el.classList.remove('newEmail');
+      if(newEmailWasFoundFlag) el.classList.add('newEmail');
+    }
+  }, [newEmailWasFoundFlag]);
   useEffect(() => {
     let interval = setInterval(async () => {
       if(buckets[0].emailSet)
@@ -82,7 +91,7 @@ const App = (props) => {
   }, []);
   useEffect(() => {
     if(authDetails){
-      getEmails();
+      getEmails("latest");
     } 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ authDetails ]);
@@ -96,6 +105,11 @@ const App = (props) => {
   useEffect(() => {
     localStorage.setItem("emailReadStatus", JSON.stringify(emailReadStatus));
   }, [emailReadStatus]);
+
+  useEffect(() => {
+    if(localStorage.getItem("nextToken") !== null) localStorage.removeItem("nextToken");
+    if(nextToken) localStorage.setItem("nextToken", nextToken);
+  }, [nextToken]);
 
   const getEmail = async (emlId) => {
     if(authTokenIsValid() && fqdn && emlId){
@@ -113,15 +127,18 @@ const App = (props) => {
     }
   };
 
-  const getEmails= async ()=> {
-    await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
+  const getEmails = async (period = "latest")=> {
+    // await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
     if(authTokenIsValid() && fqdn){
       // await setEmailList({...emailList, emailSet: undefined});
+      let url = `${EMAILS_LIST_URL}?domain=${fqdn}&${EMAIL_FOLDERPATH_QP_STRING}`; 
+      if(period === "load_more" && nextToken) url = `${url}&next-token=${encodeURIComponent(nextToken)}`;
       await axios({
-        url: `${EMAILS_LIST_URL}?domain=${fqdn}&${EMAIL_FOLDERPATH_QP_STRING}`,
+        url: url,
         headers: {'Authorization': authDetails.id_token},
       })
       .then(async (response) => {
+        if(response.data.NextToken) setNextToken(response.data.NextToken);
         if(response.data.Contents.length > 0){
           return await Promise.all(response.data.Contents.map(async (email) => {
             email.emailContent = await getEmail(email.Key);
@@ -130,12 +147,17 @@ const App = (props) => {
         }
       })
       .then(async values => {
+        if(emailList && emailList.emailSet) values.unshift(...emailList.emailSet);
+        values = uniqueify(values);
         let tempEmailSet = values.sort((a, b) => a.Key.localeCompare(b.Key));
         let tempBuckets = makeBuckets(tempEmailSet);
         await setBuckets(tempBuckets);
         assignReadUnread(tempEmailSet);
         await setEmailList({...emailList, emailSet: tempBuckets[0].emailSet,statusMsg: "Hooray! You haven't received any emails today. Lucky you!"});
       })
+      .then(() => {
+        if(period === "latest") setNewEmailWasFoundFlag(false);
+      });
     } else {
       setEmailList({...emailList, statusMsg:'Please login again...' })
       redirectToLogin();
@@ -182,7 +204,7 @@ const App = (props) => {
           region: keys.region
         });
         setSes(tempSes);
-        getEmails();
+        getEmails("latest");
       }
     } else {
       setSes(undefined);

@@ -53,3 +53,12 @@ export function initializeEmailReadStatus() {
   }
   return x;
 }
+
+export function uniqueify (obj) {
+  if(obj){
+    return Object.values(obj.reduce((a, o) => {
+      if(!a[o.Key]) a[o.Key] = o;
+      return a;
+    }, {}));
+  }
+ };

@@ -32,7 +32,7 @@ h1{
     margin-left: 20vw;
 }
 
-#newEmail{
+.newEmail{
     width: 0.5em;
     height: 0.5em;
     background: red;
