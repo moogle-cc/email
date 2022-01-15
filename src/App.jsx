@@ -13,7 +13,7 @@ import './App.css';
 import SideBar from './components/sidebar';
 import {DEFAULT_FQDN, COGNITO_LOGIN_URL, EMAILS_LIST_URL, NEW_EMAIL_CHECKOUT_TIME, 
   COMMENT_POST_URL, EMAIL_CONTENT_URL, EMAIL_FOLDERPATH_QP_STRING} from './constants';
-import {initializeEmailReadStatus, markEmailReadStatus, uniqueify } from './utils.js';
+import {initializeEmailReadStatus, markEmailReadStatus, uniqueify, getNewestEmails} from './utils.js';
 
 const App = (props) => {
   const fqdn= DEFAULT_FQDN;
@@ -48,20 +48,35 @@ const App = (props) => {
   const [emailReadStatus, setEmailReadStatus] = useState(initializeEmailReadStatus());
   const [nextToken, setNextToken] = useState(undefined);
   const [newEmailWasFoundFlag, setNewEmailWasFoundFlag] = useState(false);
+  const [newestEmails, setNewestEmails] = useState(undefined);
   const myWorker = worker();
   myWorker.addEventListener('message', async (e) => {
     if(e.data.NEW_EMAIL_WAS_FOUND){
       setNewEmailWasFoundFlag(true);
-      //document.getElementsByClassName("newEmailHighlighter")[0].setAttribute('id', 'newEmail');
+      console.log(`Checking if newest emails array was sent`);
+      if(e.data.LATEST_EMAILS_LIST){
+        //let x = getNewestEmails(emailList.emailSet, e.data.LATEST_EMAILS_LIST);
+        //console.log(`Newest emails set length = ${x ? x.length : "------100------"}`);
+        //setNewestEmails(x);
+        console.log(`Newest emails set = ${JSON.stringify(e.data.LATEST_EMAILS_LIST)}`);
+        setNewestEmails(e.data.LATEST_EMAILS_LIST);
+      }
     }
   });
   useEffect(() => {
     let el = document.getElementsByClassName("newEmailHighlighter")[0];
     if(el) {
       el.classList.remove('newEmail');
-      if(newEmailWasFoundFlag) el.classList.add('newEmail');
+      if(newEmailWasFoundFlag) {
+        el.classList.add('newEmail');
+      }
     }
   }, [newEmailWasFoundFlag]);
+  useEffect(() => {
+    if(newestEmails){
+      console.log(`Here are the new emails @ ${JSON.stringify(newestEmails)}`);
+    }
+  }, [newestEmails]);
   useEffect(() => {
     let interval = setInterval(async () => {
       if(buckets[0].emailSet)
@@ -127,6 +142,16 @@ const App = (props) => {
     }
   };
 
+  const downloadEmailBodyForSet = async set => {
+    if(set){
+      return Promise.all(
+        set.map(async (email) => {
+          email.emailContent = await getEmail(email.Key);
+          return email;
+        }));
+    }
+  }
+
   const getEmails = async (period = "latest")=> {
     // await setEmailList({emailSet: undefined,currentEmail: undefined,currentEmailId: undefined, emailContent: undefined, statusMsg: 'Retrieving...'});
     if(authTokenIsValid() && fqdn){
@@ -140,10 +165,7 @@ const App = (props) => {
       .then(async (response) => {
         if(response.data.NextToken) setNextToken(response.data.NextToken);
         if(response.data.Contents.length > 0){
-          return await Promise.all(response.data.Contents.map(async (email) => {
-            email.emailContent = await getEmail(email.Key);
-            return email;
-          }));
+          return await downloadEmailBodyForSet(response.data.Contents);
         }
       })
       .then(async values => {
