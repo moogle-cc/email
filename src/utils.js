@@ -50,6 +50,8 @@ export function initializeEmailReadStatus() {
       x.unreadList = Object.keys(x.unread).map(emlKey => getEmailIdFromKey(emlKey));
       delete x.unread;
     }
+    x.readList = x.readList || [];
+    x.unreadList = x.unreadList || [];
   }
   return x;
 }
@@ -61,4 +63,20 @@ export function uniqueify (obj) {
       return a;
     }, {}));
   }
- };
+};
+
+export function getNewestEmails(oldSet, newSet) {
+  console.log(`Getting newest emails. Oldset = ${oldSet || "empty"}, Newset = ${newSet || "empty"}`);
+  if(oldSet && newSet){
+    let oldSetIds = oldSet.reduce((a, e) => {
+      if(!a.includes(e.Key)) a.push(e.Key);
+      return a;
+    }, []);
+    if(oldSetIds){
+      console.log(`Oldset = ${oldSetIds}`);
+      return newSet.filter((e) => {
+        if(!oldSetIds.includes(e.Key)) return e;
+      });
+    }
+  }
+};

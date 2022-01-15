@@ -3,7 +3,7 @@
 The tool acts as a domain level email client for AWS SES and can be used to send and receive emails just like you would with Gmail or Outlook. The app is built using React and styles using custom, handwritten css.
 
 Here's what the inbox looks like live. 
-![Moogle Inbox Screenshot](https://github.com/moogle-cc/email/blob/b98a3d192e5cf91f58dffa72a0a7677d030b2fc0/images/Moogle%20Email%20Screenshot.png)
+![Moogle Inbox Screenshot](https://github.com/moogle-cc/email/blob/ec0b9d8987d0325b44fe3aa99c2cd646ec05d7a2/images/Moogle%20Email%20Screenshot.png)
 
 Full Disclosure - the search function does not work at all. The search box is just for decorative purposes for now. To be fait, I haven't missed it all that much since I've been using my own inbox. The comments function is also broken right now but I will be fixing it soon.
 
