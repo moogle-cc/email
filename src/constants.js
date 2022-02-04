@@ -15,6 +15,6 @@ export const CLIENT_ID = '55rveqjqgv9db4g3haobt21mp1';
 export const RESPONSE_TYPE = 'token';
 export const SCOPE = 'email+openid';
 export const NEW_EMAIL_CHECKOUT_TIME = 300000;
-export const COGNITO_LOGIN_URL = `${COGNITO_URL}/login?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${LOGIN_REDIRECT_URL}`;
+export const COGNITO_LOGIN_URL = `${COGNITO_URL}login?client_id=${CLIENT_ID}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&redirect_uri=${LOGIN_REDIRECT_URL}`;
 export const EMAIL_FOLDERPATH_QP_STRING = `folderpath=/email`;
 export const BCC_EMAIL = `secret-bcc-sent-folder@${DEFAULT_FQDN}`;
